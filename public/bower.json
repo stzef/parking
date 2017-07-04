@@ -1,0 +1,16 @@
+{
+  "name": "parking",
+  "description": "A Vue.js project",
+  "main": "",
+  "authors": [
+    "Cristhian Morales <sistematizaref.programador4@gmail.com>"
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "moment": "^2.18.1",
+    "eonasdan-bootstrap-datetimepicker": "^4.17.47",
+    "moment-timezone": "^0.5.13"
+  }
+}
