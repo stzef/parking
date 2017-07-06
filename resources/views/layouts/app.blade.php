@@ -12,6 +12,7 @@
 
     <!-- Styles -->
     <link href="{{ asset('bower_components/bootstrap/dist/css/bootstrap.css') }}" rel="stylesheet">
+    <link href="{{ asset('node_modules/alertifyjs/build/css/alertify.min.css') }}" rel="stylesheet">
     <script src="{{ asset('bower_components/jquery/dist/jquery.min.js') }}"></script>
 </head>
 <body>
@@ -71,12 +72,30 @@
                 </div>
             </div>
         </nav>
-
-        @yield('content')
+        @if(Auth::guest())
+            @yield('content')
+        @else    
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <center><Clock :blink="true" /></center>
+                        <hr>
+                        <ul class="nav nav-stacked">
+                            <li><button class="btn btn-block"><i class="glyphicon glyphicon-upload"></i>   ENTRADA</button></li>
+                            <li><button class="btn btn-block"><i class="glyphicon glyphicon-download"></i> SALIDA</button></li>
+                            <li><button class="btn btn-block"><i class="glyphicon glyphicon-list-alt"></i> LISTA</button></li>
+                        </ul>
+                    <hr>
+                    </div>
+                    @yield('content')
+                </div>
+            </div>
+        @endif
     </div>
 
     <!-- Scripts -->
     <script src="{{ asset('bower_components/bootstrap/dist/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('node_modules/alertifyjs/build/alertify.min.js') }}"></script>
     <script type="text/javascript" src="{{asset('dist/build.js')}}"></script>
 </body>
 </html>

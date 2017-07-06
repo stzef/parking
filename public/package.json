@@ -10,6 +10,7 @@
     "watch": "cross-env NODE_ENV=development webpack -w --progress --hide-modules"
   },
   "dependencies": {
+    "alertifyjs": "^1.10.0",
     "moment": "^2.18.1",
     "vue": "^2.3.4",
     "vue-datepicker": "^1.3.0",

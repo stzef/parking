@@ -2,18 +2,23 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use parking\Models\Empresas;
-use parking\Models\Movimientos;
-use parking\Models\Users;
-use parking\Models\Sedes;
-use parking\Models\Tarifas;
-use parking\Models\Timovi;
-use parking\Models\Tipovehiculo;
+use \App\Models\Empresas;
+use \App\Models\Movimientos;
+use \App\Models\Users;
+use \App\Models\Sedes;
+use \App\Models\Tarifas;
+use \App\Models\Timovi;
+use \App\Models\Tipovehiculo;
 class APIController extends Controller{
 
 	public function tarifas(){
 		$tarifas = Tarifas::all();
-		return response()->json($tarifas);
+		return response()->json($tarifas->toArray());
+	}
+
+	public function tipovehiculo(){
+		$tipovehiculo = Tipovehiculo::all();
+		return response()->json($tipovehiculo->toArray());
 	}
 }
 ?>

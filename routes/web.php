@@ -17,4 +17,17 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::group(['prefix'=>'movimientos'], function(){
+	Route::group(['prefix' => 'entrada'], function(){
+		Route::get('/', 'MovimientosController@index')->name('entrada');
+		Route::post('/create','MovimientosController@createEntrada')->name('create');
+	});
+});
+Route::group(['prefix' => 'api'], function(){
+	Route::group(['prefix' => 'tarifas'], function(){
+		Route::get('/', "APIController@tarifas");
+	});
+	Route::group(['prefix' => 'tipovehiculo'], function(){
+		Route::get('/', "APIController@tipovehiculo");
+	});
+});

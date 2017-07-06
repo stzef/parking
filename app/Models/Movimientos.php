@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -17,6 +17,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property integer $vrpagar
  * @property string $placa
  * @property boolean $cortesia
+ * @property string $updated_at
+ * @property string $created_at
  * @property Sede $sede
  * @property Tarifa $tarifa
  * @property Timovi $timovi
@@ -28,7 +30,7 @@ class Movimientos extends Model
     /**
      * @var array
      */
-    protected $fillable = ['sedes_id', 'ctarifa', 'ctimovi', 'cusu', 'ctipov', 'fhentrada', 'fhsalida', 'tiempo', 'vrpagar', 'placa', 'cortesia'];
+    protected $fillable = ['sedes_id', 'ctarifa', 'ctimovi', 'cusu', 'ctipov', 'fhentrada', 'fhsalida', 'tiempo', 'vrpagar', 'placa', 'cortesia', 'updated_at', 'created_at'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
