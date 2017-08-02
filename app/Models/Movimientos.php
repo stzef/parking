@@ -37,7 +37,7 @@ class Movimientos extends Model
      */
     public function sede()
     {
-        return $this->belongsTo('App\Sede', 'sedes_id');
+        return $this->belongsTo('App\Models\Sede', 'sedes_id');
     }
 
     /**
@@ -45,7 +45,7 @@ class Movimientos extends Model
      */
     public function tarifa()
     {
-        return $this->belongsTo('App\Tarifa', 'ctarifa', 'ctarifa');
+        return $this->belongsTo('App\Models\Tarifa', 'ctarifa', 'ctarifa');
     }
 
     /**
@@ -53,7 +53,7 @@ class Movimientos extends Model
      */
     public function timovi()
     {
-        return $this->belongsTo('App\Timovi', 'ctimovi', 'ctimovi');
+        return $this->belongsTo('App\Models\Timovi', 'ctimovi', 'ctimovi');
     }
 
     /**
@@ -69,6 +69,6 @@ class Movimientos extends Model
      */
     public function tipovehiculo()
     {
-        return $this->belongsTo('App\Tipovehiculo', 'ctipov', 'ctipov');
+        return $this->belongsTo('App\Models\Tipovehiculo', 'ctipov', 'ctipov');
     }
 }

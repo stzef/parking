@@ -28,6 +28,6 @@ class Timovi extends Model
      */
     public function movimientos()
     {
-        return $this->hasMany('App\Movimiento', 'ctimovi', 'ctimovi');
+        return $this->hasMany('App\Models\Movimiento', 'ctimovi', 'ctimovi');
     }
 }

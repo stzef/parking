@@ -11,14 +11,24 @@ use \App\Models\Timovi;
 use \App\Models\Tipovehiculo;
 class APIController extends Controller{
 
-	public function tarifas(){
+	public function tarifas(Request $request){
 		$tarifas = Tarifas::all();
 		return response()->json($tarifas->toArray());
 	}
 
-	public function tipovehiculo(){
+	public function tipovehiculo(Request $request){
 		$tipovehiculo = Tipovehiculo::all();
 		return response()->json($tipovehiculo->toArray());
+	}
+
+	public function sedes(Request $request){
+		$sedes = Sedes::all();
+		return response()->json($sedes->toArray());
+	}
+
+	public function movimientos(Request $request){
+		$movimientos = Movimientos::all();
+		return response()->json($movimientos->toArray());
 	}
 }
 ?>

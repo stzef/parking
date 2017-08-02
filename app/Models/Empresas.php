@@ -26,6 +26,6 @@ class Empresas extends Model
      */
     public function sedes()
     {
-        return $this->hasMany('App\Sede');
+        return $this->hasMany('App\Models\Sede');
     }
 }

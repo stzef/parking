@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property integer $capacidad
  * @property Empresa $empresa
  * @property Movimiento[] $movimientos
+ * @property User[] $users
  */
 class Sedes extends Model
 {
@@ -24,7 +25,7 @@ class Sedes extends Model
      */
     public function empresa()
     {
-        return $this->belongsTo('App\Empresa');
+        return $this->belongsTo('App\Models\Empresa');
     }
 
     /**
@@ -32,6 +33,14 @@ class Sedes extends Model
      */
     public function movimientos()
     {
-        return $this->hasMany('App\Movimiento', 'sedes_id');
+        return $this->hasMany('App\Models\Movimiento', 'sedes_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function users()
+    {
+        return $this->hasMany('App\User');
     }
 }

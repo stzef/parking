@@ -22,6 +22,6 @@ class Tarifas extends Model
      */
     public function movimientos()
     {
-        return $this->hasMany('App\Movimiento', 'ctarifa', 'ctarifa');
+        return $this->hasMany('App\Models\Movimiento', 'ctarifa', 'ctarifa');
     }
 }

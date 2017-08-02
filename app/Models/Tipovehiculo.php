@@ -28,6 +28,6 @@ class Tipovehiculo extends Model
      */
     public function movimientos()
     {
-        return $this->hasMany('App\Movimiento', 'ctipov', 'ctipov');
+        return $this->hasMany('App\Models\Movimiento', 'ctipov', 'ctipov');
     }
 }
