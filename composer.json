@@ -11,7 +11,8 @@
         "codedge/laravel-fpdf": "^1.2",
         "laravel/framework": "5.4.*",
         "laravel/installer": "^1.3",
-        "laravel/tinker": "~1.0"
+        "laravel/tinker": "~1.0",
+        "milon/barcode": "^5.3"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

@@ -45,7 +45,7 @@ class Movimientos extends Model
      */
     public function tarifa()
     {
-        return $this->belongsTo('App\Models\Tarifa', 'ctarifa', 'ctarifa');
+        return $this->belongsTo('App\Models\Tarifas', 'ctarifa', 'ctarifa');
     }
 
     /**

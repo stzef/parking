@@ -5,8 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @property integer $ctipov
- * @property string $detalle
+ * @property int $ctipov
+ * @property string $ntipov
+ * @property int $vrtipov
  * @property Movimiento[] $movimientos
  */
 class Tipovehiculo extends Model
@@ -19,15 +20,22 @@ class Tipovehiculo extends Model
     protected $table = 'tipovehiculo';
 
     /**
+     * The primary key for the model.
+     * 
+     * @var string
+     */
+    protected $primaryKey = 'ctipov';
+
+    /**
      * @var array
      */
-    protected $fillable = ['detalle'];
+    protected $fillable = ['ntipov', 'vrtipov'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function movimientos()
     {
-        return $this->hasMany('App\Models\Movimiento', 'ctipov', 'ctipov');
+        return $this->hasMany('App\Movimiento', 'ctipov', 'ctipov');
     }
 }

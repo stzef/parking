@@ -3,8 +3,11 @@ import Clock from 'vue-digital-clock';
 import SelectTariff from './SelectTariff.vue';
 import SelectTyve from './SelectTyve.vue';
 import SelectSeat from './SelectSeat.vue';
-import SelectPlaca from './SelectPlaca.vue';
 import moment from 'moment';
+import $ from 'jquery';
+import 'datatables.net'
+window.$ = $;
+
 var app = new Vue({
   el: '#app',
   components: {
@@ -12,14 +15,12 @@ var app = new Vue({
     SelectTariff,
     SelectTyve,
     SelectSeat,
-    SelectPlaca
   },
   data: {
     tarifas:[],
     tipovehiculo:[],
     sedes:[],
     movimientos:[],
-    placas:[],
     _token:'',
     entrada:{
       'fhentrada' : '',
@@ -29,7 +30,8 @@ var app = new Vue({
     },
     salida:{
       'fhsalida' : '',
-      'placa' : ''
+      'placa' : '',
+      'cmovi' : ''
     }
   },
   methods:{
@@ -55,9 +57,13 @@ var app = new Vue({
         })
         .then(response => {
           return response.json();
+
         })
         .then(response => {
-          alertify.success('Entrada Exitosa')        
+          alertify.success('Entrada Exitosa')
+          var url = 'entrada/pdf/'+response['obj']['id']
+          window.open(url)
+
         })
         .catch(function(error) {
           alertify.error('Error al crear la entrada')
@@ -130,21 +136,38 @@ var app = new Vue({
       .then(response => {
         return response.json()
       }).then(movimientos => {
-        var placa = []
-        for (var i = movimientos.length - 1; i >= 0; i--) {
-          if(movimientos[i].ctimovi == 1){
-            placa = {"cmovi":movimientos[i].cmovi,"placa":movimientos[i].placa}
-            app.placas.push(placa)
-          }
-        }
-        console.log(app.placas)
         app.movimientos = movimientos
       });
     },
-
+    slugify:function(text){
+        return text.toString().toLowerCase()
+          .replace(/[^a-z0-9-]/gi, '').
+          replace(/-+/g, '').
+          replace(/^-|-$/g, '');           // Trim - from end of text
+    },
+    list(){
+      var table = $("#table").DataTable({});
+      var movimiento = this.movimientos.map(function(movimiento){
+        var fhhora = (movimiento.fhentrada).split(' ')
+        var fh = fhhora[0] 
+        var hora = fhhora[1] 
+        var data = [movimiento.placa,fh,hora,movimiento.tarifa.ntarifa,movimiento.tipovehiculo.ntipov,'<button class="btn btn-primary"  @click.native="setPlaca('+movimiento.placa+','+movimiento.cmovi+')">Seleccionar</button>']
+        return data
+      })
+      table.clear()
+      table.rows.add(movimiento)
+      table.draw()    
+    },
+    setPlaca:function(placa,cmovi){
+      console.log(placa)
+      console.log('-')
+      console.log(cmovi)
+      app.salida.placa = placa
+      app.salida.cmovi = cmovi 
+    }
   },
   mounted(){
-    $("#table").DataTable();
+    // var dt = require( 'datatables.net' )();
     this.getSeat()
     this.getTyve()
     this.getTariff()

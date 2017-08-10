@@ -21,7 +21,7 @@
                     <div class="form-group col-md-4 col-md-offset-1">
                         <label for="placa" class="label-control col-md-12 text-center">Placa</label>
                         <div class="col-md-12">
-                            <input type="text" name="placa" class="form-control" v-model="entrada.placa">
+                            <input type="text" name="placa" class="form-control" v-model="entrada.placa" @change="entrada.placa = slugify($event.target.value)">
                         </div>
                     </div>
                     <div class="form-group col-md-6">

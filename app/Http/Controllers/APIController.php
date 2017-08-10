@@ -28,7 +28,12 @@ class APIController extends Controller{
 
 	public function movimientos(Request $request){
 		$movimientos = Movimientos::all();
-		return response()->json($movimientos->toArray());
+		$movimientosArr = $movimientos->toArray();
+		foreach ($movimientosArr as $i => $movimiento) {
+			$movimientosArr[$i]['tarifa'] = (Tarifas::where('ctarifa',$movimiento['ctarifa'])->first())->toArray();
+			$movimientosArr[$i]['tipovehiculo'] = (Tipovehiculo::where('ctipov',$movimiento['ctipov'])->first())->toArray();
+		}
+		return response()->json($movimientosArr);
 	}
 }
 ?>

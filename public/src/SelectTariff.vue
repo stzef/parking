@@ -13,7 +13,7 @@ export default {
     id: {type : String,},
     required: {type : String,},
     tarifas: {type: Array,},
-    entrada: {type: Array,}
+    entrada: {type: Object,}
   },
   mounted (){this.$emit("mounted")}
 }

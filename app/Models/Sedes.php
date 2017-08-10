@@ -5,10 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @property integer $id
- * @property integer $empresa_id
- * @property string $nombre
- * @property integer $capacidad
+ * @property int $csede
+ * @property int $empresa_id
+ * @property string $nsede
+ * @property int $capacidad
  * @property Empresa $empresa
  * @property Movimiento[] $movimientos
  * @property User[] $users
@@ -16,16 +16,23 @@ use Illuminate\Database\Eloquent\Model;
 class Sedes extends Model
 {
     /**
+     * The primary key for the model.
+     * 
+     * @var string
+     */
+    protected $primaryKey = 'csede';
+
+    /**
      * @var array
      */
-    protected $fillable = ['empresa_id', 'nombre', 'capacidad'];
+    protected $fillable = ['empresa_id', 'nsede', 'capacidad'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function empresa()
     {
-        return $this->belongsTo('App\Models\Empresa');
+        return $this->belongsTo('App\Empresa');
     }
 
     /**
@@ -33,7 +40,7 @@ class Sedes extends Model
      */
     public function movimientos()
     {
-        return $this->hasMany('App\Models\Movimiento', 'sedes_id');
+        return $this->hasMany('App\Movimiento', 'sedes_id', 'csede');
     }
 
     /**
@@ -41,6 +48,6 @@ class Sedes extends Model
      */
     public function users()
     {
-        return $this->hasMany('App\User');
+        return $this->hasMany('App\User', null, 'csede');
     }
 }

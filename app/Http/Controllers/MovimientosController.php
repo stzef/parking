@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\User;
 use \App\Models\Movimientos;
+use \App\Models\Empresas;
 use \App\Models\Tarifas;
+use \App\Models\Parametros;
 use \App\Models\Tipovehiculo;
 use \Auth;
 use Codedge\Fpdf\Fpdf\Fpdf;
@@ -52,7 +54,7 @@ class MovimientosController extends Controller
                 'ctarifa' => 'required|exists:tarifas,ctarifa',
                 'ctipov' => 'required|exists:tipovehiculo,ctipov',
                 'fhentrada' => 'required',
-                'sedes_id' => 'required|exists:sedes,id',
+                'sedes_id' => 'required|exists:sedes,csede',
                 'ctimovi' => 'required|exists:timovi,ctimovi'
             ],
             [
@@ -98,54 +100,107 @@ class MovimientosController extends Controller
             return response()->json(array("obj" => $movimientos->toArray()));
         }
     }
-    public function pdf(Request $request,$cmovi=1){
+    public function pdf($cmovi){
         $movimiento = Movimientos::where("cmovi",$cmovi)->first();
-        $title = "TIQUETE DE ENTRADA";
-        $pdf = new Fpdf('P','mm',array(85,85));
+        $empresa = Empresas::first();
+        $tarifas = Tarifas::all();
+        $tipovehiculos = Tipovehiculo::all();
+        $parametrosheader = Parametros::where('cparam','like','E%')->get();
+        $parametrosfooter = Parametros::where('cparam','like','F%')->get();
+        $txttarifas = 'Tarifas ';
+        $txttipovehiculo = 'Tipos de Vehiculos ';
+        $fhentrada = explode(" ", $movimiento->fhentrada);
+        $pdf = new Fpdf('P','mm',array(82,200));
         $pdf->AddPage();
         $maxHeight = $pdf->h;
         $maxWidth = $pdf->w;
         $cellHeightHeader = 15;
         $cellHeight = 10;
-        $pdf->SetFillColor(115,115,115);
+        
         $pdf->setY(5);
         $pdf->setX($maxWidth*0.06);
+        $pdf->SetFont('Arial', 'B', 16);
+        $pdf->Cell($maxWidth*0.88, $cellHeightHeader,$empresa->nombre,0,0,'C');
+
+        $pdf->setY($pdf->getY() + 5);
+        $pdf->setX($maxWidth*0.06);
         $pdf->SetFont('Arial', 'B', 12);
-        $pdf->Cell($maxWidth*0.88, $cellHeightHeader,$title,0,0,'C');
+        $pdf->Cell($maxWidth*0.88, $cellHeightHeader,"NIT ".$empresa->nit,0,0,'C');
 
-        $pdf->setY($pdf->getY()+15);
+        $pdf->setY($pdf->getY() + 5);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', '', 7);
-        $pdf->Cell($maxWidth*0.44,$cellHeight,'PLACA',1,0,'C',1);
-        $pdf->SetFont('Arial', 'B', 7);
-        $pdf->Cell($maxWidth*0.44,$cellHeight,$movimiento->placa,1,0,'C');
+        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->Cell($maxWidth*0.88, $cellHeightHeader,$empresa->direccion,0,0,'C');
 
+        foreach ($tarifas as $tarifa) {
+            $txttarifas .= $tarifa->ntarifa.'-'.$tarifa->vrtarifa.' ';
+        }
+        foreach ($tipovehiculos as $tipovehiculo) {
+            $txttipovehiculo .= $tipovehiculo->detalle.' ';
+        }
 
-        $pdf->Ln();
-
+        $pdf->setY($pdf->getY() + 6);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', '', 7);
-        $pdf->Cell($maxWidth*0.44,$cellHeight,'TARIFA',1,0,'C',1);
-        $pdf->SetFont('Arial', 'B', 7);
-        $pdf->Cell($maxWidth*0.44,$cellHeight,$movimiento->ctarifa,1,0,'C');
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->Cell($maxWidth*0.88, $cellHeightHeader,$txttarifas,0,0,'C');
 
-        $pdf->Ln();
-
+        $pdf->setY($pdf->getY() + 8);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', '', 7);
-        $pdf->Cell($maxWidth*0.44,$cellHeight,'TIPO DE VEHICULO',1,0,'C',1);
-        $pdf->SetFont('Arial', 'B', 7);
-        $pdf->Cell($maxWidth*0.44,$cellHeight,$movimiento->placa,1,0,'C');
+        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->Cell($maxWidth*0.88, $cellHeightHeader,mb_strtoupper($movimiento->tipovehiculo->ntipov.' $'.$movimiento->tarifa->vrtarifa),0,0,'C');
+
+        $pdf->Ln(4);
+
+        foreach ($parametrosheader as $parametro) {
+            $pdf->setY($pdf->getY() + 5);
+            $pdf->setX($maxWidth*0.06);
+            $pdf->SetFont('Arial', '', 11);
+            $pdf->Cell($maxWidth*0.88, $cellHeightHeader,$parametro->value_text,0,0,'C');
+        }
+
+        $pdf->setY($pdf->getY() + 5);
+        $pdf->setX($maxWidth*0.06);
+        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->Cell($maxWidth*0.88, $cellHeightHeader,Auth::user()->sede->nombre,0,0,'C');
+
+        $pdf->setY($pdf->getY() + 12);
+        $pdf->setX($maxWidth*0.06);
+        $pdf->SetFont('Arial', 'B', 36);
+        $pdf->Cell($maxWidth*0.88, $cellHeightHeader,mb_strtoupper($movimiento->placa),0,0,'C');
         
-        $pdf->Ln();
-
-        $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', '', 7);
-        $pdf->Cell($maxWidth*0.44,$cellHeight,'FECHA Y HORA DE ENTRADA',1,0,'C',1);
-        $pdf->SetFont('Arial', 'B', 7);
-        $pdf->Cell($maxWidth*0.44,$cellHeight,$movimiento->fhentrada,1,0,'C');
-
+        $pdf->Ln(2);
         
+        $pdf->SetLineWidth(1);
+        $pdf->Line($maxWidth*0.06, $pdf->getY() + 12, $maxWidth*0.93, $pdf->getY() + 12);
+
+        $pdf->Ln(4);
+
+        $pdf->Code128($maxWidth*0.06,$pdf->getY() + 12,$movimiento->placa,$maxWidth*0.88,$cellHeightHeader);
+        
+        $pdf->setY($pdf->getY() + 30);
+        $pdf->setX($maxWidth*0.15);
+        $pdf->SetFont('Arial', '', 12);
+        $pdf->Cell($maxWidth*0.34, $cellHeightHeader,'FECHA',0,0,'L');
+        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->Cell($maxWidth*0.54, $cellHeightHeader,$fhentrada[0],0,0,'L');
+        
+        $pdf->setY($pdf->getY() + 8);
+        $pdf->setX($maxWidth*0.15);
+        $pdf->SetFont('Arial', '', 12);
+        $pdf->Cell($maxWidth*0.34, $cellHeightHeader,'HORA',0,0,'L');
+        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->Cell($maxWidth*0.54, $cellHeightHeader,$fhentrada[1],0,0,'L');
+        $pdf->Ln();
+        foreach ($parametrosfooter as $parametro) {
+            $pdf->SetLineWidth(1.5);
+            $pdf->Line($maxWidth*0.06, $pdf->getY() + 5, $maxWidth*0.93, $pdf->getY() + 5);
+            
+            $pdf->setY($pdf->getY() + 8);
+            $pdf->setX($maxWidth*0.06);
+            $pdf->SetFont('Arial', 'B', $parametro->value_int);
+            $pdf->MultiCell($maxWidth*0.88,4,utf8_decode($parametro->value_text),0,'C',0);
+
+        }
         $pdf->Output();
         $this->renderPdf();
         $pdf->Close();

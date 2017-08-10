@@ -15,6 +15,12 @@
     <link href="{{ asset('bower_components/bootstrap/dist/css/bootstrap.css') }}" rel="stylesheet">
     <link href="{{ asset('node_modules/alertifyjs/build/css/alertify.min.css') }}" rel="stylesheet">
     <script src="{{ asset('bower_components/jquery/dist/jquery.min.js') }}"></script>
+    <style type="text/css" media="screen">
+    a.btn {
+        text-decoration: none;
+        color: initial;
+    }
+    </style>
 </head>
 <body>
     <div id="app">
@@ -82,9 +88,9 @@
                         <center><Clock :blink="true" /></center>
                         <hr>
                         <ul class="nav nav-stacked">
-                            <li><button href="{{URL::route('entrada')}}" class="btn btn-block"><i class="glyphicon glyphicon-upload"></i>   ENTRADA</button></li>
-                            <li><button href="{{URL::route('salida')}}" class="btn btn-block"><i class="glyphicon glyphicon-download"></i> SALIDA</button></li>
-                            <li><button href="#" class="btn btn-block"><i class="glyphicon glyphicon-list-alt"></i> LISTA</button></li>
+                            <li><a href="{{URL::route('entrada')}}" class="btn btn-block"><i class="glyphicon glyphicon-upload"></i>   ENTRADA</a></li>
+                            <li><a href="{{URL::route('salida')}}" class="btn btn-block"><i class="glyphicon glyphicon-download"></i> SALIDA</a></li>
+                            <li><a href="#" class="btn btn-block"><i class="glyphicon glyphicon-list-alt"></i> LISTA</a></li>
                         </ul>
                     <hr>
                     </div>
