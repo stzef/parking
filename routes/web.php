@@ -20,11 +20,12 @@ Auth::routes();
 Route::group(['prefix'=>'movimientos'], function(){
 	Route::group(['prefix' => 'entrada'], function(){
 		Route::get('/', 'MovimientosController@index')->name('entrada'); 
-		Route::get('/pdf/{cmovi}', "MovimientosController@pdf");
+		Route::get('/ticket/{cmovi}', "MovimientosController@ticketEntrada");
 		Route::post('/create','MovimientosController@createEntrada')->name('create');
 	});
 	Route::group(['prefix' => 'salida'], function(){
 		Route::get('/', 'MovimientosController@salida')->name('salida');
+		Route::get('/ticket/{cmovi}', "MovimientosController@ticketSalida");
 		Route::post('/create','MovimientosController@createSalida')->name('create');
 	});
 	Route::group(['prefix' => 'list'], function(){

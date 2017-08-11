@@ -62,7 +62,7 @@
                             <th>Fecha Entrada</th>
                             <th>Tarifa</th>
                             <th>Tipo Vehiculo</th>
-                            <th>¿Como le pongo?</th>
+                            <th>Tipo De Movimiento</th>
                             <th></th>
                         </tr>
                     </thead>

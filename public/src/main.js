@@ -63,7 +63,7 @@ var app = new Vue({
         .then(response => {
           alertify.success('Entrada Exitosa')
           console.log(response)
-          var url = 'entrada/pdf/'+response['obj']['cmovi']
+          var url = 'entrada/ticket/'+response['obj']['cmovi']
           window.open(url)
 
         })
@@ -89,7 +89,9 @@ var app = new Vue({
           return response.json();
         })
         .then(response => {  
-          alertify.success('salida Exitosa')        
+          alertify.success('salida Exitosa')
+          var url = 'salida/ticket/'+response['obj']['cmovi']
+          window.open(url)        
         })
         .catch(function(error) {  
           alertify.error('Error al crear la salida')
