@@ -10,6 +10,7 @@ window.$ = $;
 
 var app = new Vue({
   el: '#app',
+  delimiters : ['[[', ']]'],
   components: {
     Clock,
     SelectTariff,
@@ -61,7 +62,8 @@ var app = new Vue({
         })
         .then(response => {
           alertify.success('Entrada Exitosa')
-          var url = 'entrada/pdf/'+response['obj']['id']
+          console.log(response)
+          var url = 'entrada/pdf/'+response['obj']['cmovi']
           window.open(url)
 
         })
@@ -136,6 +138,7 @@ var app = new Vue({
       .then(response => {
         return response.json()
       }).then(movimientos => {
+        console.log(movimientos)
         app.movimientos = movimientos
       });
     },
@@ -145,25 +148,13 @@ var app = new Vue({
           replace(/-+/g, '').
           replace(/^-|-$/g, '');           // Trim - from end of text
     },
-    list(){
-      var table = $("#table").DataTable({});
-      var movimiento = this.movimientos.map(function(movimiento){
-        var fhhora = (movimiento.fhentrada).split(' ')
-        var fh = fhhora[0] 
-        var hora = fhhora[1] 
-        var data = [movimiento.placa,fh,hora,movimiento.tarifa.ntarifa,movimiento.tipovehiculo.ntipov,'<button class="btn btn-primary"  @click.native="setPlaca('+movimiento.placa+','+movimiento.cmovi+')">Seleccionar</button>']
-        return data
-      })
-      table.clear()
-      table.rows.add(movimiento)
-      table.draw()    
-    },
     setPlaca:function(placa,cmovi){
-      console.log(placa)
-      console.log('-')
-      console.log(cmovi)
       app.salida.placa = placa
-      app.salida.cmovi = cmovi 
+      app.salida.cmovi = cmovi
+    },
+    list(){
+      $('#table').DataTable().destroy();
+      $('#table').DataTable();
     }
   },
   mounted(){
@@ -172,5 +163,5 @@ var app = new Vue({
     this.getTyve()
     this.getTariff()
     this.getMovimientos()
-  }
+  },
 })

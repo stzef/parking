@@ -32,6 +32,7 @@ class APIController extends Controller{
 		foreach ($movimientosArr as $i => $movimiento) {
 			$movimientosArr[$i]['tarifa'] = (Tarifas::where('ctarifa',$movimiento['ctarifa'])->first())->toArray();
 			$movimientosArr[$i]['tipovehiculo'] = (Tipovehiculo::where('ctipov',$movimiento['ctipov'])->first())->toArray();
+			$movimientosArr[$i]['timovi'] = (Timovi::where('ctimovi',$movimiento['ctimovi'])->first())->toArray();
 		}
 		return response()->json($movimientosArr);
 	}

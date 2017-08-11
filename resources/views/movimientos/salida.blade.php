@@ -27,7 +27,7 @@
                     </div>
                     <div class="form-group col-md-12">
                         <div class="col-md-12">
-                            <center><button type="submit" class="btn btn-success">Buscar</button></center>
+                            <center><button type="submit" class="btn btn-success">Generar</button></center>
                         </div>
                     </div>
                 </form>
@@ -36,15 +36,21 @@
         </div>
     </div>
     <div id="list" class="modal fade" role="dialog">
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-lg">
 
         <!-- Modal content-->
         <div class="modal-content">
             
           <!-- Modal Header-->
           <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">Lista</h4>
+            <div class="col-md-10">
+                <h4 class="modal-title">Historial</h4>
+            </div>
+            <div class="col-md-2">
+                <center>
+                    <button type="button" class="btn btn-block btn-danger" data-dismiss="modal">&times;</button>
+                </center>
+            </div>
           </div>
           
           <!-- Modal Body-->
@@ -54,20 +60,22 @@
                         <tr>
                             <th>Placa</th>
                             <th>Fecha Entrada</th>
-                            <th>Hora Entrada</th>
                             <th>Tarifa</th>
                             <th>Tipo Vehiculo</th>
+                            <th>¿Como le pongo?</th>
                             <th></th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                        <tr v-for="movimiento in movimientos">
+                            <td>[[movimiento.placa]]</td>
+                            <td>[[movimiento.fhentrada]]</td>
+                            <td>[[movimiento.tarifa.ntarifa]]</td>
+                            <td>[[movimiento.tipovehiculo.ntipov]]</td>
+                            <td>[[movimiento.timovi.ntimovi]]</td>
+                            <td>
+                                <button class="btn btn-primary" @click="setPlaca(movimiento.placa,movimiento.cmovi)" :disabled="movimiento.ctimovi == 2" data-dismiss="modal">Seleccionar</button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -75,7 +83,7 @@
 
           <!-- Modal Footer-->
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
           </div>
         </div>
 

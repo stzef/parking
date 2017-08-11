@@ -29,18 +29,39 @@ class MovimientosController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
     public function index()
     {
         return view('movimientos/entrada');
     }
+
     public function salida()
     {
         return view('movimientos/salida');
     }
+
     public function list()
     {
         return view('movimientos/list');
     }
+
+    public function getTime($date1,$date2,$tarifa){
+        $datetime1 = new DateTime($date1);
+        $datetime2 = new DateTime($date2);
+        $interval = date_diff($datetime1, $datetime2);
+        if ($tarifa->ctarifa == 1) {
+            $tiempo = (1440 * $interval->d ) + (60 * $interval->h) + $interval->i ;
+            $vrpagar = $tiempo * $tarifa->vrtarifa;
+        }elseif ($tarifa->ctarifa == 2) {
+            $tiempo =(24 * $interval->d) + $interval->h;
+            $vrpagar = $tiempo * $tarifa->vrtarifa; 
+        }elseif ($tarifa->ctarifa == 3){
+            $vrpagar = $interval->d * $tarifa->vrtarifa;
+        }
+        $Arr = array('Tiempo' => $interval->format('%H:%I:%S') , 'Valor' => $vrpagar );
+        return $Arr;
+    }
+
     public function createEntrada(Request $request){
         $dataBody = $request->all();
         $dataBody['fhentrada'] = new DateTime($dataBody['fhentrada']);
@@ -77,28 +98,53 @@ class MovimientosController extends Controller
     }
     public function createSalida(Request $request){
         $dataBody = $request->all();
-        $movimientos = Movimientos::find('placa',$dataBody['placa'])->first();
-        if($movimientos){
-            $validator = Validator::make($dataBody,
-                [  
-                    'placa' => 'required|exists:movimientos,placa|max:15',
-                    'fhsalida' => 'required',
-                ],
-                [
-                    'placa.required' => 'required',
-                    'fhsalida.required' => 'required',
-                ]
-            );
-            if ($validator->fails()){
-                $messages = $validator->messages();
-                return response()->json(array("errors_form" => $messages),400);
-            }else{
-                
-                $movimientos->save($dataBody);
-                var_dump("hola");exit();
-            }
-            return response()->json(array("obj" => $movimientos->toArray()));
+        $dataBody['cmovi'] = (int)$dataBody['cmovi'];
+        $movimiento = Movimientos::where('cmovi',$dataBody['cmovi'])->first();
+        $dataBody['fhentrada'] = $movimiento->fhentrada;
+        $Arr = $this->getTime($dataBody['fhentrada'],$dataBody['fhsalida'],$movimiento->tarifa);
+        $dataBody['fhsalida'] = new DateTime($dataBody['fhsalida']);
+        $dataBody['cusu'] = Auth::user()->id;
+        $dataBody['sedes_id'] = Auth::user()->sede_id;
+        $dataBody['ctimovi'] = 2;
+        $dataBody['tiempo'] = $Arr['Tiempo'];
+        $dataBody['vrpagar'] = $Arr['Valor'];
+        $dataBody['ctarifa'] = $movimiento->ctarifa;
+        $dataBody['ctipov'] = $movimiento->ctipov;
+        $dataBody['ctarifa'] = $movimiento->ctarifa;
+        $validator = Validator::make($dataBody,
+            [
+                'cusu' => 'required|exists:users,id',   
+                'placa' => 'required|max:15',
+                'ctarifa' => 'required|exists:tarifas,ctarifa',
+                'ctipov' => 'required|exists:tipovehiculo,ctipov',
+                'fhentrada' => 'required',
+                'fhsalida' => 'required',
+                'tiempo' => 'required',
+                'vrpagar' => 'required',
+                'sedes_id' => 'required|exists:sedes,csede',
+                'ctimovi' => 'required|exists:timovi,ctimovi'
+            ],
+            [
+                'cusu.required' => 'required',
+                'placa.required' => 'required',
+                'ctarifa.required' => 'required',
+                'ctipov.required' => 'required',
+                'fhentrada.required' => 'required',
+                'fhsalida.required' => 'required',
+                'tiempo.required' => 'required',
+                'vrpagar.required' => 'required',
+                'sedes_id.required' => 'required',
+                'ctimovi.required' => 'required',
+            ]
+        );
+        if ($validator->fails()){
+            $messages = $validator->messages();
+            return response()->json(array("errors_form" => $messages),400);
+        }else{
+            $salida = Movimientos::create($dataBody);
         }
+        return response()->json(array("obj" => $salida->toArray()));
+
     }
     public function pdf($cmovi){
         $movimiento = Movimientos::where("cmovi",$cmovi)->first();

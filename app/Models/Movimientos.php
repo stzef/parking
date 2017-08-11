@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Movimientos extends Model
 {
+    protected $primaryKey = 'cmovi';
     /**
      * @var array
      */

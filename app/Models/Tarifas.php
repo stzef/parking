@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Tarifas extends Model
 {
+    protected $primaryKey = 'ctarifa';
     /**
      * @var array
      */

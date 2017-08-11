@@ -90,7 +90,7 @@
                         <ul class="nav nav-stacked">
                             <li><a href="{{URL::route('entrada')}}" class="btn btn-block"><i class="glyphicon glyphicon-upload"></i>   ENTRADA</a></li>
                             <li><a href="{{URL::route('salida')}}" class="btn btn-block"><i class="glyphicon glyphicon-download"></i> SALIDA</a></li>
-                            <li><a href="#" class="btn btn-block"><i class="glyphicon glyphicon-list-alt"></i> LISTA</a></li>
+                            <li><a href="{{URL::route('lista')}}" class="btn btn-block" @click="list()"><i class="glyphicon glyphicon-list-alt"></i> LISTA</a></li>
                         </ul>
                     <hr>
                     </div>
@@ -105,8 +105,5 @@
     <script src="{{ asset('node_modules/alertifyjs/build/alertify.min.js') }}"></script>
     <script src="{{ asset('/node_modules/datatables.net/js/jquery.dataTables.js') }}"></script>
     <script type="text/javascript" src="{{asset('dist/build.js')}}"></script>
-    <script type="text/javascript">
-        
-    </script>
 </body>
 </html>
