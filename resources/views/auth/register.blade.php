@@ -29,7 +29,14 @@
                             <div class="col-md-6">
                                 <select-seat name="sede" id="sede" requeried="true" :sedes="sedes"></select-seat>
                             </div>
-                        </div>                        
+                        </div>
+                        <div class="form-group">
+                            <label for="name" class="col-md-4 control-label">Rol</label>
+
+                            <div class="col-md-6">
+                                <select-roles name="rol" id="rol" requeried="true" :roles="roles"></select-roles>
+                            </div>
+                        </div>                          
                         <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
                             <label for="email" class="col-md-4 control-label">E-Mail</label>
 

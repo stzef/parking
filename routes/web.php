@@ -31,6 +31,8 @@ Route::group(['prefix'=>'movimientos'], function(){
 	Route::group(['prefix' => 'list'], function(){
 		Route::get('/', 'MovimientosController@list')->name('lista');
 	});
+	Route::post('/time','MovimientosController@setTime')->name('time');
+
 });
 Route::group(['prefix' => 'api'], function(){
 	Route::group(['prefix' => 'tarifas'], function(){
@@ -43,6 +45,9 @@ Route::group(['prefix' => 'api'], function(){
 		Route::get('/', "APIController@sedes");
 	});
 	Route::group(['prefix' => 'movimientos'], function(){
-		Route::get('/', "APIController@movimientos");
+		Route::post('/', "APIController@movimientos");
+	});
+	Route::group(['prefix' => 'roles'], function(){
+		Route::get('/', "APIController@roles");
 	});
 });

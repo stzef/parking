@@ -2,28 +2,83 @@
 
 @section('content')
 <template>
-    <div class="col-sm-9">
+    <div class="col-md-9">
         <div class="col-md-12">
-            <div class="panel-heading">
-                <center><h1>Salida</h1></center>
-            </div>
             <div class="panel panel-default">
+                <div class="panel-heading">
+                    <center><h1>SALIDA</h1></center>
+                </div>
                 <div class="panel-body">
                 <form @submit.prevent="CreateSalida" accept-charset="utf-8">
                     <input type="hidden" name="_token" id="token" value="{{csrf_token()}}"></input>
-                    <div class="form-group col-md-4 col-md-offset-1">
-                        <label for="placa" class="label-control col-md-12 text-center">Placa</label>
-                        <div class="input-group">
-                            <input type="text" name="fhsalida" v-model="salida.placa" class="form-control col-md-8" :value="salida.placa" required>
-                            <span class="input-group-btn"><button type="button" class="btn btn-default" @click="list()" data-toggle="modal" data-target="#list">Buscar</button></span>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label for="" class="label-control col-md-12 text-center">Fecha y Hora de salida</label>
+                            <div class="input-group">
+                                <input type="text" name="fhsalida" v-model="salida.fhsalida" class="form-control col-md-8" disabled required>
+                                <span class="input-group-btn"><button type="button" class="btn btn-default"  @click="GenOutTime()">Generar</button></span>                            
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="placa" class="label-control col-md-12 text-center">Placa</label>
+                            <div class="input-group">
+                                <input type="text" v-model="salida.placa" class="form-control col-md-8 placa" :value="salida.placa" @change="getMovimiento(slugify(salida.placa))" required>
+                                <span class="input-group-btn"><button type="button" class="btn btn-default" @click="list()" data-toggle="modal" data-target="#list">Buscar</button></span>
+                            </div>
                         </div>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="" class="label-control col-md-12 text-center">Fecha y Hora de salida</label>
-                        <div class="input-group">
-                            <input type="text" name="fhsalida" v-model="salida.fhsalida" class="form-control col-md-8" :value="entrada.fhsalida" disabled required>
-                            <span class="input-group-btn"><button type="button" class="btn btn-default"  @click="GenOutTime()">Generar</button></span>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label for="" class="label-control col-md-12 text-center">Fecha y Hora de Entrada</label>
+                            <input type="text" name="fhentrada" v-model="salida.fhentrada" class="form-control col-md-12" disabled required>
                         </div>
+                        <div class="form-group col-md-6">
+                            <label class="label-control col-md-12 text-center">Tiempo</label>
+                            <input type="text" name="tiempo" v-model="salida.tiempo" class="form-control col-md-12" disabled="" :value = "salida.tiempo" @click="setTime()">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label for="" class="label-control col-md-12 text-center">Tarifa</label>
+                            <div class="col-md-12">
+                                <select-tariff id="ctarifa" requeried="true" :tarifas="tarifas" :obj="salida" ></select-tariff>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="" class="label-control col-md-12 text-center">Tipo de vehiculo</label>
+                            <div class="col-md-12">
+                                <select-tyve id="ctipov" requeried="true" :tipovehiculo="tipovehiculo" :obj="salida"></select-tyve>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="" class="label-control col-md-12 text-center">Valor Calculado</label>
+                            <input type="text" name="vrdescuento" class="form-control" v-model="salida.vrpagar" @keyup="setValtotal()">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="" class="label-control col-md-12 text-center">Valor Descuento</label>
+                            <input type="text" name="vrdescuento" class="form-control" v-model="salida.vrdescuento" @keyup="setValtotal()">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <label for="check" class="label-control col-md-12">Cortesia</label>
+                                    <div class="col-md-12">
+                                        <label class="switch">
+                                            <input type="checkbox" id="check" v-model="salida.cortesia" @change="setDescu()">
+                                            <span class="slider">
+                                            <span class="on">SI</span><span class="off">NO</span>
+                                            </span>
+                                        </label>                   
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="" class="label-control col-md-12 text-center">Valor Total</label>
+                            <input type="text" name="vrdescuento" class="form-control" v-model="salida.vrtotal" disabled>
+                        </div>
+                    </div>
+                    <div class="row">
                     </div>
                     <div class="form-group col-md-12">
                         <div class="col-md-12">
@@ -67,16 +122,18 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="movimiento in movimientos">
-                            <td>[[movimiento.placa]]</td>
-                            <td>[[movimiento.fhentrada]]</td>
-                            <td>[[movimiento.tarifa.ntarifa]]</td>
-                            <td>[[movimiento.tipovehiculo.ntipov]]</td>
-                            <td>[[movimiento.timovi.ntimovi]]</td>
-                            <td>
-                                <button class="btn btn-primary" @click="setPlaca(movimiento.placa,movimiento.cmovi)" :disabled="movimiento.ctimovi == 2" data-dismiss="modal">Seleccionar</button>
-                            </td>
-                        </tr>
+                        <template v-for="movimiento in movimientos">
+                            <tr v-if="movimiento.ctimovi != 2" :id="movimiento.cmovi">
+                                    <td>[[movimiento.placa]]</td>
+                                    <td>[[movimiento.fhentrada]]</td>
+                                    <td>[[movimiento.tarifa.ntarifa]]</td>
+                                    <td>[[movimiento.tipovehiculo.ntipov]]</td>
+                                    <td>[[movimiento.timovi.ntimovi]]</td>
+                                    <td>
+                                        <button class="btn btn-primary" @click="setData(movimiento)" :disabled="movimiento.ctimovi == 2" data-dismiss="modal">Seleccionar</button>
+                                    </td>
+                            </tr>
+                        </template>
                     </tbody>
                 </table>
           </div>

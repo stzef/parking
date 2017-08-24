@@ -172,7 +172,7 @@ return [
         /**
         * Third Party Service Providers...
         */
-        Bican\Roles\RolesServiceProvider::class,
+        HttpOz\Roles\RolesServiceProvider::class,
         Codedge\Fpdf\FpdfServiceProvider::class,
         Milon\Barcode\BarcodeServiceProvider::class,
 

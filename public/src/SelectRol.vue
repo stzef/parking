@@ -1,19 +1,19 @@
 <template>
       <select :name="id" :id="id" class="form-control" :required="required">
         <option selected="" value="">Seleccione...</option>
-        <template v-for="sede in sedes">
-        	<option :value="sede.csede">{{sede.nsede}}</option>
+        <template v-for="rol in roles">
+        	<option :value="rol.slug">{{rol.name}}</option>
         </template>
       </select>        
 </template>
 <script>
 export default {
-  name: 'select-seat',
+  name: 'select-rol',
   props: {
     name: {type : String,},
     id: {type : String,},
     required: {type : String,},
-    sedes: {type: Array,}
+    roles: {type: Array,}
   },
   mounted (){this.$emit("mounted")}
 }

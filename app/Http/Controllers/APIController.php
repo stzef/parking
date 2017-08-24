@@ -10,25 +10,31 @@ use \App\Models\Tarifas;
 use \App\Models\Timovi;
 use \App\Models\Tipovehiculo;
 class APIController extends Controller{
-
 	public function tarifas(Request $request){
 		$tarifas = Tarifas::all();
 		return response()->json($tarifas->toArray());
 	}
-
 	public function tipovehiculo(Request $request){
 		$tipovehiculo = Tipovehiculo::all();
 		return response()->json($tipovehiculo->toArray());
 	}
-
 	public function sedes(Request $request){
 		$sedes = Sedes::all();
 		return response()->json($sedes->toArray());
 	}
-
+	public function roles(Request $request){
+		$roles = \HttpOz\Roles\Models\Role::all();
+		return response()->json($roles->toArray());
+	}
 	public function movimientos(Request $request){
-		$movimientos = Movimientos::all();
-		$movimientosArr = $movimientos->toArray();
+		$dataBody = $request->all();
+		if($dataBody){
+			$movimientos =  Movimientos::where('ctimovi','=',1)->where('placa','=',$dataBody['placa'])->get();
+			$movimientosArr = $movimientos->toArray();
+		}else{
+			$movimientos = Movimientos::all();
+			$movimientosArr = $movimientos->toArray();
+		}
 		foreach ($movimientosArr as $i => $movimiento) {
 			$movimientosArr[$i]['tarifa'] = (Tarifas::where('ctarifa',$movimiento['ctarifa'])->first())->toArray();
 			$movimientosArr[$i]['tipovehiculo'] = (Tipovehiculo::where('ctipov',$movimiento['ctipov'])->first())->toArray();
