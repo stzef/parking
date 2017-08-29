@@ -7,7 +7,7 @@ import SelectRoles from './SelectRol.vue';
 import moment from 'moment';
 import momentz from 'moment-timezone';
 import $ from 'jquery';
-import 'datatables.net'
+import 'datatables.net';
 window.$ = $;
 
 var app = new Vue({
@@ -25,15 +25,9 @@ var app = new Vue({
     tipovehiculo:[],
     sedes:[],
     movimientos:[],
+    movimiento:[],
     roles:[],
     _token:'',
-    constantes:{
-      tarifas :{
-        'minuto':1,
-        'hora':2,
-        'dia':3,
-      }
-    },
     entrada:{
       'fhentrada' : '',
       'ctarifa' : '',
@@ -52,6 +46,10 @@ var app = new Vue({
       'tiempo' : '',
       'ctipov' : '',
       'cortesia': ''
+    }
+  },
+  watch: {
+    'salida.ctarifa':function(){
     }
   },
   methods:{
@@ -163,9 +161,9 @@ var app = new Vue({
       .then(response => {
         return response.json()
       }).then(tipovehiculo => {
-        app.tipovehiculo = tipovehiculo
-        app.entrada.ctipov = "1"
-        app.salida.ctipov = "1"
+        this.tipovehiculo = tipovehiculo
+        this.entrada.ctipov = "1"
+        this.salida.ctipov = "1"
       });      
     },
     getSeat(){
@@ -176,7 +174,7 @@ var app = new Vue({
       .then(response => {
         return response.json()
       }).then(sedes => {
-        app.sedes = sedes
+        this.sedes = sedes
       });  
     },
     getRoles(){
@@ -187,7 +185,7 @@ var app = new Vue({
       .then(response => {
         return response.json()
       }).then(roles => {
-        app.roles = roles
+        this.roles = roles
       });  
     },
     getMovimiento(placa){
@@ -210,16 +208,18 @@ var app = new Vue({
       .then(response => {
         return response.json()
       }).then(movimiento => {
-          this.salida.cmovi = movimiento[0]['cmovi']
-          this.salida.fhentrada = movimiento[0]['fhentrada']
-          this.salida.ctarifa = movimiento[0]['ctarifa']
-          this.salida.ctipov = movimiento[0]['ctipov']
+          this.movimiento = movimiento
+          console.log(this.movimiento[0]['cmovi'])
+          this.salida.cmovi = this.movimiento[0]['cmovi']
+          this.salida.fhentrada = this.movimiento[0]['fhentrada']
+          this.salida.ctarifa = this.movimiento[0]['ctarifa']
+          this.salida.ctipov = this.movimiento[0]['ctipov']
           this.GenOutTime()
           this.setTime()
-          this.setVal(movimiento[0]['tarifa'])
+          this.setVal(this.movimiento[0]['tarifa'])
       }); 
     },
-    getMovimientos(placa){
+    getMovimientos(){
       this._token = $('form').find("input").val()
       fetch("/api/movimientos",{
         credentials: 'include',
@@ -244,15 +244,15 @@ var app = new Vue({
           replace(/^-|-$/g, '');           // Trim - from end of text
     },
     setData(entrada){
-      console.log(entrada)
-      app.salida.cmovi = entrada.cmovi
-      app.salida.placa = entrada.placa
-      app.salida.fhentrada = entrada.fhentrada
-      app.salida.ctarifa = entrada.ctarifa
-      app.salida.ctipov = entrada.ctipov
+      this.movimiento = entrada
+      this.salida.cmovi = this.movimiento.cmovi
+      this.salida.placa = this.movimiento.placa
+      this.salida.fhentrada = this.movimiento.fhentrada
+      this.salida.ctarifa = this.movimiento.ctarifa
+      this.salida.ctipov = this.movimiento.ctipov
       this.GenOutTime()
       this.setTime()
-      this.setVal(entrada.tarifa)
+      this.setVal(this.movimiento.tarifa)
     },
     setTime(){
       if(app.salida.fhsalida){
@@ -266,7 +266,7 @@ var app = new Vue({
       var hours=("0"+ hour ).slice(-2)
       var minutes=("0"+ minute ).slice(-2)
       
-        app.salida.tiempo = ""+days+ ":" +hours + ":" +minutes;
+        this.salida.tiempo = ""+days+ ":" +hours + ":" +minutes;
       }else{
         alertify.error("no generada la hora de salida");
       }
@@ -293,11 +293,13 @@ var app = new Vue({
       }).then(vrpagar => {
         console.log(vrpagar)
         this.salida.vrpagar = currencyFormat.format(vrpagar.obj)
+        this.salida.vrtotal = currencyFormat.format(vrpagar.obj)
       });
     },
     setDescu(){
       if(this.salida.cortesia){
         this.salida.vrpagar = currencyFormat.sToN(this.salida.vrpagar)
+        this.salida.vrtotal = currencyFormat.sToN(this.salida.vrtotal)
         this.salida.vrdescuento = this.salida.vrpagar
         this.salida.vrtotal = this.salida.vrpagar - this.salida.vrdescuento
         this.salida.vrdescuento = currencyFormat.format(this.salida.vrdescuento)
@@ -311,6 +313,7 @@ var app = new Vue({
     setValtotal(){
       this.salida.vrpagar = currencyFormat.sToN(this.salida.vrpagar)
       this.salida.vrdescuento = currencyFormat.sToN(this.salida.vrdescuento)
+      this.salida.vrtotal = currencyFormat.sToN(this.salida.vrtotal)
       if(this.salida.vrdescuento > this.salida.vrpagar){
         alertify.error("El descuento no puede ser mayor al valor calculado")
         this.salida.vrtotal = currencyFormat.format(this.salida.vrpagar)

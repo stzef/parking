@@ -41,7 +41,7 @@
                         <div class="form-group col-md-6">
                             <label for="" class="label-control col-md-12 text-center">Tarifa</label>
                             <div class="col-md-12">
-                                <select-tariff id="ctarifa" requeried="true" :tarifas="tarifas" :obj="salida" ></select-tariff>
+                                <select-tariff id="ctarifa" requeried="true" :tarifas="tarifas" :obj="salida"></select-tariff>
                             </div>
                         </div>
                         <div class="form-group col-md-6">

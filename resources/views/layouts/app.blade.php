@@ -179,7 +179,8 @@
                             <li><a href="{{URL::route('entrada')}}" class="btn btn-block"><i class="glyphicon glyphicon-upload"></i>   ENTRADA</a></li>
                             <li><a href="{{URL::route('salida')}}" class="btn btn-block"><i class="glyphicon glyphicon-download"></i> SALIDA</a></li>
                             @role('admin') 
-                                <li><a href="{{URL::route('lista')}}" class="btn btn-block" @click="list()"><i class="glyphicon glyphicon-list-alt"></i> LISTA</a></li>
+                                <li><a href="{{URL::route('lista')}}" class="btn btn-block" @click="list()"><i class="glyphicon glyphicon-list-alt"></i> LISTADO POR FECHAS </a></li>
+                                <li><a href="{{URL::route('lista')}}" class="btn btn-block" @click="list()"><i class="glyphicon glyphicon-list-alt"></i> LISTADO POR HORAS </a></li>
                             @endrole
                         </ul>
                     <hr>

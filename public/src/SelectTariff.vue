@@ -1,5 +1,5 @@
 <template>
-      <select v-model="obj.ctarifa" :name="id" :id="id" class="form-control" :required="required">
+      <select v-model="obj.ctarifa" @change="() => {this.$root.setVal(tarifa)}" :name="id" :id="id" class="form-control" :required="required">
         <template v-for="tarifa in tarifas">
         	<option :value="tarifa.ctarifa">{{tarifa.ntarifa}} ( $ {{tarifa.vrtarifa}} )</option>
         </template>
@@ -15,7 +15,9 @@ export default {
     tarifas: {type: Array,},
     obj: {type: Object,}
   },
-  mounted (){this.$emit("mounted")}
+  mounted (){
+    this.$emit("mounted")
+  }
 }
 </script>
 <style></style>
