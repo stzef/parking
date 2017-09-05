@@ -6,7 +6,7 @@
         <div class="col-md-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <center><h1>SALIDA</h1></center>
+                    <center><h2>SALIDA</h2></center>
                 </div>
                 <div class="panel-body">
                 <form @submit.prevent="CreateSalida" accept-charset="utf-8">
@@ -41,13 +41,13 @@
                         <div class="form-group col-md-6">
                             <label for="" class="label-control col-md-12 text-center">Tarifa</label>
                             <div class="col-md-12">
-                                <select-tariff id="ctarifa" requeried="true" :tarifas="tarifas" :obj="salida"></select-tariff>
+                                <select-tariff id="ctarifa" requeried="true" :tarifas="tarifas" :obj="salida" disabled></select-tariff>
                             </div>
                         </div>
                         <div class="form-group col-md-6">
                             <label for="" class="label-control col-md-12 text-center">Tipo de vehiculo</label>
                             <div class="col-md-12">
-                                <select-tyve id="ctipov" requeried="true" :tipovehiculo="tipovehiculo" :obj="salida"></select-tyve>
+                                <select-tyve id="ctipov" requeried="true" :tipovehiculo="tipovehiculo" :obj="salida" disabled></select-tyve>
                             </div>
                         </div>
                     </div>

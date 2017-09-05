@@ -6,6 +6,7 @@ import SelectSeat from './SelectSeat.vue';
 import SelectRoles from './SelectRol.vue';
 import moment from 'moment';
 import momentz from 'moment-timezone';
+import Datepicker from 'vuejs-datepicker';
 import $ from 'jquery';
 import 'datatables.net';
 window.$ = $;
@@ -19,9 +20,15 @@ var app = new Vue({
     SelectTyve,
     SelectSeat,
     SelectRoles,
+    Datepicker
   },
   data: {
     tarifas:[],
+    reportDate : {
+        Date1:'',
+        Date2:'',
+    },
+    params:[],
     tipovehiculo:[],
     sedes:[],
     movimientos:[],
@@ -60,7 +67,8 @@ var app = new Vue({
     GenOutTime(){
       this.salida.fhsalida = momentz.tz(moment(), "America/Bogota").format('YYYY-MM-DD HH:mm:ss');
       this.setTime()
-      this.salida.placa = this.slugify(this.salida.placa)
+      this.salida.placa = this.slugify(this.salida.placa
+        )
     },
     CreateEntrada(){
         this._token = $('form').find("input").val()
@@ -151,6 +159,17 @@ var app = new Vue({
         this.tarifas = tarifas
         this.entrada.ctarifa = "1"
         this.salida.ctarifa = "1"
+      });
+    },
+    getParams(){
+      fetch("/api/params",{
+        credentials: 'include',
+        type : "GET",
+      })
+      .then(response => {
+        return response.json()
+      }).then(params => {
+        this.params = params
       });
     },
     getTyve(){
@@ -329,12 +348,19 @@ var app = new Vue({
     list(){
       $('#table').DataTable().destroy();
       $('#table').DataTable();
+    },
+    dataReport(){
+      this.reportDate.Date1 = moment(this.reportDate.Date1).format('YYYY-MM-DD')
+      this.reportDate.Date2 = moment(this.reportDate.Date2).format('YYYY-MM-DD')
+      var url = '/movimientos/list/report/'+this.reportDate.Date1+'/'+this.reportDate.Date2
+      window.open(url)
     }
   },
   mounted(){
     this.getSeat()
     this.getTyve()
     this.getTariff()
+    this.getParams()
     this.getRoles()
     this.getMovimientos()
 

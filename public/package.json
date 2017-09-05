@@ -19,7 +19,8 @@
     "vue-datetime-picker": "^0.2.1",
     "vue-digital-clock": "^1.5.0",
     "vue-search-select": "^2.3.9",
-    "vuejs-date-picker": "^1.0.1"
+    "vuejs-date-picker": "^1.0.1",
+    "vuejs-datepicker": "^0.9.11"
   },
   "devDependencies": {
     "babel-core": "^6.0.0",
