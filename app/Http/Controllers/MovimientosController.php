@@ -174,7 +174,7 @@ class MovimientosController extends Controller
         $txttarifas = 'Tarifas ';
         $txttipovehiculo = 'Tipos de Vehiculos ';
         $fhentrada = explode(" ", $movimiento->fhentrada);
-        $pdf = new Fpdf('P','mm',array(58,215));
+        $pdf = new Fpdf('P','mm',array(58,225));
         $pdf->AddPage();
         $consecutivofc = Parametros::where('cparam','CF')->first();
         $maxHeight = $pdf->h;
@@ -187,22 +187,22 @@ class MovimientosController extends Controller
         
         $pdf->setY(7);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 10);
+        $pdf->SetFont('Arial', 'B', 8);
         $pdf->Cell($maxWidth*0.88, $cellHeightHeader,$empresa->nombre,0,0,'C');
 
         $pdf->setY($pdf->getY() + 5);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 10);
+        $pdf->SetFont('Arial', 'B', 8);
         $pdf->Cell($maxWidth*0.88, $cellHeightHeader,"NIT. ".$empresa->nit.'-'.$empresa->dv,0,0,'C');
 
         $pdf->setY($pdf->getY() + 5);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 10);
+        $pdf->SetFont('Arial', 'B', 8);
         $pdf->Cell($maxWidth*0.88, $cellHeightHeader,$empresa->direccion,0,0,'C');
 
         $pdf->setY($pdf->getY() + 5);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 10);
+        $pdf->SetFont('Arial', 'B', 8);
         $pdf->Cell($maxWidth*0.88, $cellHeightHeader,Auth::user()->sede->nsede,0,0,'C');
 
         $pdf->Line($maxWidth*0.06, $pdf->getY() + 11, $maxWidth*0.93, $pdf->getY() + 11);
@@ -218,14 +218,14 @@ class MovimientosController extends Controller
         $pdf->SetFont('Arial', 'B', 8);
         $pdf->Cell($maxWidth*0.88, $cellHeightHeader,utf8_decode('TIQUETE ENTRADA Nº ').$consecutivofc->value_text.str_pad($movimiento->cmovi,7, 0, STR_PAD_LEFT),0,0,'C');
 
-        $pdf->setY($pdf->getY() + 5);
+        $pdf->setY($pdf->getY() + 13);
         $pdf->setX($maxWidth*0.06);
         $pdf->SetFont('Arial', '', 8);
-        $pdf->Cell($maxWidth*0.88, $cellHeightHeader,$txttarifas,0,0,'C');
+        $pdf->Multicell($maxWidth*0.88, 3,$txttarifas,0,'C',0);
 
-        $pdf->setY($pdf->getY() + 8);
+        $pdf->setY($pdf->getY());
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 10);
+        $pdf->SetFont('Arial', 'B', 8);
         $pdf->Cell($maxWidth*0.88, $cellHeightHeader,mb_strtoupper($movimiento->tipovehiculo->ntipov.' - '.$movimiento->tarifa->ntarifa.' ($'.$movimiento->tarifa->vrtarifa.")"),0,0,'C');
 
         $pdf->Ln(2);
@@ -240,7 +240,7 @@ class MovimientosController extends Controller
 
         $pdf->setY($pdf->getY() + 12);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 36);
+        $pdf->SetFont('Arial', 'B', 34);
         $pdf->Cell($maxWidth*0.88, $cellHeightHeader,mb_strtoupper($movimiento->placa),0,0,'C');
         
         $pdf->Ln(2);
@@ -338,22 +338,22 @@ class MovimientosController extends Controller
         
         $pdf->setY(7);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 10);
+        $pdf->SetFont('Arial', 'B', 8);
         $pdf->Cell($maxWidth*0.88, $cellHeightHeader,$empresa->nombre,0,0,'C');
 
         $pdf->setY($pdf->getY() + 5);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 10);
+        $pdf->SetFont('Arial', 'B', 8);
         $pdf->Cell($maxWidth*0.88, $cellHeightHeader,"NIT. ".$empresa->nit.'-'.$empresa->dv,0,0,'C');
 
         $pdf->setY($pdf->getY() + 5);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 10);
+        $pdf->SetFont('Arial', 'B', 8);
         $pdf->Cell($maxWidth*0.88, $cellHeightHeader,$empresa->direccion,0,0,'C');
 
         $pdf->setY($pdf->getY() + 5);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 10);
+        $pdf->SetFont('Arial', 'B', 8);
         $pdf->Cell($maxWidth*0.88, $cellHeightHeader,Auth::user()->sede->nsede,0,0,'C');
 
         $pdf->Line($maxWidth*0.06, $pdf->getY() + 11, $maxWidth*0.93, $pdf->getY() + 11);
