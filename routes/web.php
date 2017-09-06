@@ -36,6 +36,7 @@ Route::group(['prefix'=>'movimientos'], function(){
 		Route::get('/', 'MovimientosController@config')->name('config');
 	});	
 	Route::post('/time','MovimientosController@setTime')->name('time');
+	Route::post('/params','MovimientosController@saveParams')->name('params');
 
 });
 Route::group(['prefix' => 'api'], function(){

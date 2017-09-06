@@ -157,6 +157,17 @@ class MovimientosController extends Controller
         }
         return response()->json(array("obj" => $salida));
     }
+    public function saveParams(request $request){
+        $dataBody = $request->all();
+        foreach ($dataBody as $key => $value) {
+            $parametro = Parametros::where('id',$key)->first();
+            if($parametro){
+                $parametro->value_text = $value;
+                $parametro->save();
+            }
+        }
+        return response()->json(array("obj" => $dataBody));
+    }
     public function ticketEntrada($cmovi){
         $movimiento = Movimientos::where("cmovi",$cmovi)->first();
         $empresa = Empresas::first();

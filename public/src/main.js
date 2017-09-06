@@ -148,6 +148,31 @@ var app = new Vue({
           alertify.error('Error al crear la salida')
         })
     },
+    saveParams(){
+        this._token = $('form').find("input").val()
+        var params = $('form').serialize()
+        console.log(params)    
+        fetch("/movimientos/params",{
+          credentials: 'include',
+          method : "POST",
+          type: "POST",
+          headers: {
+            'Accept': 'application/json, application/xml, text/plain, text/html, *.*',
+            'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+            'X-CSRF-TOKEN' : this._token,
+          },
+          body: params,
+        })
+        .then(response => {
+          return response.json();
+        })
+        .then(response => {
+          alertify.success('Guardado Exitoso')
+        })
+        .catch(function(error) {
+          alertify.error('Error al guardar los parametros')
+        })        
+    },
     getTariff(){
       fetch("/api/tarifas",{
         credentials: 'include',

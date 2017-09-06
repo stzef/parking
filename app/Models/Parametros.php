@@ -14,10 +14,10 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Parametros extends Model
 {
-	protected $primaryKey = 'cparam';
+	protected $primaryKey = 'id';
     /**
      * @var array
      */
-    protected $fillable = ['cparam', 'name', 'type', 'value_text', 'value_bool', 'value_int'];
+    protected $fillable = ['id','cparam', 'name', 'type', 'value_text', 'value_bool', 'value_int'];
 
 }
