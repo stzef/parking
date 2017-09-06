@@ -32,7 +32,13 @@
           width: 90px;
           height: 34px;
         }
-
+        .clock {
+          background-color: #263238;
+          color: #eceff1;
+          padding: .3rem .6rem;
+          font-size: 5rem;
+          font-family: 'Menlo', monospace;
+        }
         .switch input {display:none;}
 
         .slider {
