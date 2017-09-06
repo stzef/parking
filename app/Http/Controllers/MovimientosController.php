@@ -174,7 +174,7 @@ class MovimientosController extends Controller
         $txttarifas = 'Tarifas ';
         $txttipovehiculo = 'Tipos de Vehiculos ';
         $fhentrada = explode(" ", $movimiento->fhentrada);
-        $pdf = new Fpdf('P','mm',array(58,225));
+        $pdf = new Fpdf('P','mm',array(58,218));
         $pdf->AddPage();
         $consecutivofc = Parametros::where('cparam','CF')->first();
         $maxHeight = $pdf->h;
