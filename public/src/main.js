@@ -338,6 +338,7 @@ var app = new Vue({
         console.log(vrpagar)
         this.salida.vrpagar = currencyFormat.format(vrpagar.obj)
         this.salida.vrtotal = currencyFormat.format(vrpagar.obj)
+        this.salida.vrdescuento = currencyFormat.format(0)
       });
     },
     setDescu(){
