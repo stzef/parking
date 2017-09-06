@@ -191,7 +191,7 @@ class MovimientosController extends Controller
         
         $pdf->setY(7);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 16);
+        $pdf->SetFont('Arial', 'B', 14);
         $pdf->Cell($maxWidth*0.88, $cellHeightHeader,$empresa->nombre,0,0,'C');
 
         $pdf->setY($pdf->getY() + 5);
@@ -342,7 +342,7 @@ class MovimientosController extends Controller
         
         $pdf->setY(7);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 16);
+        $pdf->SetFont('Arial', 'B', 14);
         $pdf->Cell($maxWidth*0.88, $cellHeightHeader,$empresa->nombre,0,0,'C');
 
         $pdf->setY($pdf->getY() + 5);
@@ -553,7 +553,7 @@ class MovimientosController extends Controller
         $maxHeight = $pdf->h;
         $maxWidth = $pdf->w;
 
-        $pdf->SetFont('Courier', 'B', 16);
+        $pdf->SetFont('Courier', 'B', 14);
         $pdf->Cell($maxWidth*0.92, 3,$empresa->nombre,0,0,'C');
         $pdf->SetFont('Courier', 'B', 9);
         $pdf->Ln(5);
