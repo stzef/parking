@@ -373,7 +373,12 @@ var app = new Vue({
     },
     list(){
       $('#table').DataTable().destroy();
-      $('#table').DataTable();
+      $('#table').DataTable({
+            "paging": false,
+            "ordering": false,
+            "searching": false,
+            "info": false,
+      });
     },
     dataReport(){
       this.reportDate.Date1 = moment(this.reportDate.Date1).format('YYYY-MM-DD')
