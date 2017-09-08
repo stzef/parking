@@ -33,7 +33,7 @@
                             <input type="text" name="fhentrada" v-model="salida.fhentrada" class="form-control col-md-12" disabled required>
                         </div>
                         <div class="form-group col-md-6">
-                            <label class="label-control col-md-12 text-center">Tiempo</label>
+                            <label class="label-control col-md-12 text-center">Tiempo (Hora:Minuto)</label>
                             <input type="text" name="tiempo" v-model="salida.tiempo" class="form-control col-md-12" disabled="" :value = "salida.tiempo" @click="setTime()">
                         </div>
                     </div>

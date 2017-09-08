@@ -310,7 +310,7 @@ var app = new Vue({
       var hours=("0"+ hour ).slice(-2)
       var minutes=("0"+ minute ).slice(-2)
       
-        this.salida.tiempo = ""+days+ ":" +hours + ":" +minutes;
+        this.salida.tiempo = hours + ":" +minutes;
       }else{
         alertify.error("no generada la hora de salida");
       }
