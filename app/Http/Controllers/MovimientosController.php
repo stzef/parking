@@ -52,11 +52,15 @@ class MovimientosController extends Controller
     }
     public function setTime(Request $request){
         $dataBody = $request->all();
+        $parametro = Parametros::where('id',6)->first();
         $datetime1 = new DateTime($dataBody['salida']['fhentrada']);
         $datetime2 = new DateTime($dataBody['salida']['fhsalida']);
         $interval = date_diff($datetime1, $datetime2);
         $tiempo =(24 * $interval->d) + $interval->h;
         $vrpagar = $tiempo * $dataBody['tarifa']['vrtarifa'];
+        if($interval->i > $parametro->value_text){
+            $vrpagar += $dataBody['tarifa']['vrtarifa'];
+        }
         if($vrpagar == 0){
             $vrpagar = $dataBody['tarifa']['vrtarifa'];
         }
