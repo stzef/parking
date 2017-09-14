@@ -6,7 +6,7 @@
         <div class="col-md-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <center><h1>ENTRADA</h1></center>
+                    <center><h2>ENTRADA</h2></center>
                 </div>
                 <div class="panel-body">
                 <form @submit.prevent="CreateEntrada" accept-charset="utf-8">

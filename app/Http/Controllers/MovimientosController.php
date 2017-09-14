@@ -46,21 +46,25 @@ class MovimientosController extends Controller
     {
         return view('movimientos/list');
     }
+    public function config()
+    {
+        return view('movimientos/config');
+    }
     public function setTime(Request $request){
         $dataBody = $request->all();
+        $parametro = Parametros::where('id',6)->first();
         $datetime1 = new DateTime($dataBody['salida']['fhentrada']);
         $datetime2 = new DateTime($dataBody['salida']['fhsalida']);
         $interval = date_diff($datetime1, $datetime2);
-        if ($dataBody['tarifa']['ctarifa'] == 1) {
-            $tiempo = (1440 * $interval->d ) + (60 * $interval->h) + $interval->i ;
-            $vrpagar = $tiempo * $dataBody['tarifa']['vrtarifa'];
-        }elseif ($dataBody['tarifa']['ctarifa'] == 2) {
-            $tiempo =(24 * $interval->d) + $interval->h;
-            $vrpagar = $tiempo * $dataBody['tarifa']['vrtarifa']; 
-        }elseif ($dataBody['tarifa']['ctarifa'] == 3){
-            $vrpagar = $interval->d * $dataBody['tarifa']['vrtarifa'];
+        $tiempo =(24 * $interval->d) + $interval->h;
+        $vrpagar = $tiempo * $dataBody['tarifa']['vrtarifa'];
+        if($interval->i > $parametro->value_text){
+            $vrpagar += $dataBody['tarifa']['vrtarifa'];
         }
-        $vrpagar=round($vrpagar, -2, PHP_ROUND_HALF_UP);
+        if($vrpagar == 0){
+            $vrpagar = $dataBody['tarifa']['vrtarifa'];
+        }
+        $vrpagar=round($vrpagar, 0, PHP_ROUND_HALF_UP);
         $Arr = array($vrpagar);
         return response()->json(array("obj" => $Arr));
     }
@@ -153,6 +157,17 @@ class MovimientosController extends Controller
         }
         return response()->json(array("obj" => $salida));
     }
+    public function saveParams(request $request){
+        $dataBody = $request->all();
+        foreach ($dataBody as $key => $value) {
+            $parametro = Parametros::where('id',$key)->first();
+            if($parametro){
+                $parametro->value_text = $value;
+                $parametro->save();
+            }
+        }
+        return response()->json(array("obj" => $dataBody));
+    }
     public function ticketEntrada($cmovi){
         $movimiento = Movimientos::where("cmovi",$cmovi)->first();
         $empresa = Empresas::first();
@@ -160,10 +175,10 @@ class MovimientosController extends Controller
         $tipovehiculos = Tipovehiculo::all();
         $parametrosheader = Parametros::where('cparam','like','E%')->get();
         $parametrosfooter = Parametros::where('cparam','like','F%')->get();
-        $txttarifas = 'Tarifas ';
+        $txttarifas = '';
         $txttipovehiculo = 'Tipos de Vehiculos ';
         $fhentrada = explode(" ", $movimiento->fhentrada);
-        $pdf = new Fpdf('P','mm',array(82,200));
+        $pdf = new Fpdf('P','mm',array(58,217));
         $pdf->AddPage();
         $consecutivofc = Parametros::where('cparam','CF')->first();
         $maxHeight = $pdf->h;
@@ -172,64 +187,70 @@ class MovimientosController extends Controller
         $cellHeight = 10;
         
         $pdf->SetLineWidth(1);
-        $pdf->Line($maxWidth*0.06, $pdf->getY(), $maxWidth*0.93, $pdf->getY());
+        $pdf->Line($maxWidth*0.06, $pdf->getY()-7, $maxWidth*0.93, $pdf->getY()-7);
         
-        $pdf->setY(7);
+        $pdf->setY(1);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 16);
+        $pdf->SetFont('Arial', 'B', 8);
         $pdf->Cell($maxWidth*0.88, $cellHeightHeader,$empresa->nombre,0,0,'C');
 
         $pdf->setY($pdf->getY() + 5);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 12);
-        $pdf->Cell($maxWidth*0.88, $cellHeightHeader,"NIT. ".$empresa->nit,0,0,'C');
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->Cell($maxWidth*0.88, $cellHeightHeader,"NIT. ".$empresa->nit.'-'.$empresa->dv,0,0,'C');
 
         $pdf->setY($pdf->getY() + 5);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->SetFont('Arial', 'B', 8);
         $pdf->Cell($maxWidth*0.88, $cellHeightHeader,$empresa->direccion,0,0,'C');
 
         $pdf->setY($pdf->getY() + 5);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->SetFont('Arial', 'B', 8);
         $pdf->Cell($maxWidth*0.88, $cellHeightHeader,Auth::user()->sede->nsede,0,0,'C');
 
         $pdf->Line($maxWidth*0.06, $pdf->getY() + 11, $maxWidth*0.93, $pdf->getY() + 11);
         
-        foreach ($tarifas as $tarifa) {
-            $txttarifas .= $tarifa->ntarifa.'-'.$tarifa->vrtarifa.' ';
-        }
-        foreach ($tipovehiculos as $tipovehiculo) {
-            $txttipovehiculo .= $tipovehiculo->detalle.' ';
-        }
         $pdf->setY($pdf->getY() + 8);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 10);
+        $pdf->SetFont('Arial', 'B', 8);
         $pdf->Cell($maxWidth*0.88, $cellHeightHeader,utf8_decode('TIQUETE ENTRADA Nº ').$consecutivofc->value_text.str_pad($movimiento->cmovi,7, 0, STR_PAD_LEFT),0,0,'C');
 
-        $pdf->setY($pdf->getY() + 5);
+        $pdf->setY($pdf->getY() + 13);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', '', 8);
-        $pdf->Cell($maxWidth*0.88, $cellHeightHeader,$txttarifas,0,0,'C');
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->Cell($maxWidth*0.88, 3,'TARIFAS',0,0,'C');
+        $pdf->Ln();
+        foreach ($tarifas as $tarifa) {
+            $pdf->setX($maxWidth*0.06);
+            $pdf->SetFont('Arial', '', 7.8);
+            $pdf->Cell($maxWidth*0.88, 3,$tarifa->ntarifa.':'.$tarifa->vrtarifa.' ',0,0,'C');
+            $pdf->Ln();
+        }
 
-        $pdf->setY($pdf->getY() + 8);
+        $pdf->setY($pdf->getY());
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 12);
-        $pdf->Cell($maxWidth*0.88, $cellHeightHeader,mb_strtoupper($movimiento->tipovehiculo->ntipov.' - '.$movimiento->tarifa->ntarifa.' ($'.$movimiento->tarifa->vrtarifa.")"),0,0,'C');
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->Cell($maxWidth*0.88, $cellHeightHeader,mb_strtoupper('tarifa seleccionada'),0,0,'C');
 
-        $pdf->Ln(2);
+        $pdf->setY($pdf->getY()+5);
+        $pdf->setX($maxWidth*0.06);
+        $pdf->SetFont('Arial', 'B', 7.5);
+        $pdf->Cell($maxWidth*0.88, $cellHeightHeader,mb_strtoupper($movimiento->tarifa->ntarifa.' ($'.$movimiento->tarifa->vrtarifa.")"),0,0,'C');
+
+        $pdf->Ln(4);
 
         foreach ($parametrosheader as $parametro) {
             $pdf->setY($pdf->getY() + 5);
             $pdf->setX($maxWidth*0.06);
-            $pdf->SetFont('Arial', '', 11);
+            $pdf->SetFont('Arial', '', 7.8);
             $pdf->Cell($maxWidth*0.88, $cellHeightHeader,$parametro->value_text,0,0,'C');
         }
 
 
         $pdf->setY($pdf->getY() + 12);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 36);
+        $pdf->SetFont('Arial', 'B', 34);
         $pdf->Cell($maxWidth*0.88, $cellHeightHeader,mb_strtoupper($movimiento->placa),0,0,'C');
         
         $pdf->Ln(2);
@@ -239,42 +260,42 @@ class MovimientosController extends Controller
 
         $pdf->Ln(4);
 
-        $pdf->Code128($maxWidth*0.06,$pdf->getY() + 12,$movimiento->cmovi,$maxWidth*0.88,$cellHeightHeader);
+        $pdf->Code128($maxWidth*0.06,$pdf->getY() + 12,$movimiento->placa,$maxWidth*0.88,$cellHeightHeader);
         
         $pdf->SetLineWidth(1);
-        $pdf->Line($maxWidth*0.06, $pdf->getY() + 35, $maxWidth*0.33, $pdf->getY() + 35);
+        $pdf->Line($maxWidth*0.06, $pdf->getY() + 35, $maxWidth*0.28, $pdf->getY() + 35);
 
         $pdf->setY($pdf->getY() + 28);
         $pdf->SetFont('Arial', 'B', 12);
-        $pdf->cell($maxWidth*0.74, $cellHeightHeader,'ENTRADA',0,0,'C');
+        $pdf->cell($maxWidth*0.68, $cellHeightHeader,'ENTRADA',0,0,'C');
 
-        $pdf->Line($maxWidth*0.65, $pdf->getY()+7, $maxWidth*0.93, $pdf->getY()+7);
+        $pdf->Line($maxWidth*0.72, $pdf->getY()+7, $maxWidth*0.93, $pdf->getY()+7);
 
         $pdf->Line($maxWidth*0.058, $pdf->getY()+35, $maxWidth*0.06, $pdf->getY()+7);
         $pdf->Line($maxWidth*0.93, $pdf->getY()+35, $maxWidth*0.93, $pdf->getY()+7);
 
         $pdf->setY($pdf->getY() + 7);
         $pdf->setX($maxWidth*0.10);
-        $pdf->SetFont('Arial', '', 12);
+        $pdf->SetFont('Arial', '', 10);
         $pdf->Cell($maxWidth*0.34, $cellHeightHeader,'N. TIQUETE',0,0,'C');
         $pdf->setX($maxWidth*0.55);
-        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->SetFont('Arial', 'B', 10);
         $pdf->Cell($maxWidth*0.54, $cellHeightHeader,$consecutivofc->value_text.str_pad($movimiento->cmovi,7, 0, STR_PAD_LEFT),0,0,'L');
 
         $pdf->setY($pdf->getY() + 8);
         $pdf->setX($maxWidth*0.10);
-        $pdf->SetFont('Arial', '', 12);
+        $pdf->SetFont('Arial', '', 10);
         $pdf->Cell($maxWidth*0.34, $cellHeightHeader,'FECHA',0,0,'C');
         $pdf->setX($maxWidth*0.55);
-        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->SetFont('Arial', 'B', 10);
         $pdf->Cell($maxWidth*0.54, $cellHeightHeader,$fhentrada[0],0,0,'L');
 
         $pdf->setY($pdf->getY() + 8);
         $pdf->setX($maxWidth*0.10);
-        $pdf->SetFont('Arial', '', 12);
+        $pdf->SetFont('Arial', '', 10);
         $pdf->Cell($maxWidth*0.34, $cellHeightHeader,'HORA',0,0,'C');
         $pdf->setX($maxWidth*0.55);
-        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->SetFont('Arial', 'B', 10);
         $pdf->Cell($maxWidth*0.54, $cellHeightHeader,$fhentrada[1],0,0,'L');
 
         $pdf->Line($maxWidth*0.06, $pdf->getY()+12, $maxWidth*0.93, $pdf->getY()+12);
@@ -286,7 +307,7 @@ class MovimientosController extends Controller
             
             $pdf->setY($pdf->getY() + 10);
             $pdf->setX($maxWidth*0.06);
-            $pdf->SetFont('Arial', 'B', $parametro->value_int);
+            $pdf->SetFont('Arial', 'B', 9);
             $pdf->MultiCell($maxWidth*0.88,4,utf8_decode($parametro->value_text),0,'C',0);
 
         }
@@ -308,7 +329,7 @@ class MovimientosController extends Controller
         $fhsalida = explode(" ", $movimiento->fhsalida);
         $tiempo = explode(":", $movimiento->tiempo);
         $vrtotal = ($movimiento->vrpagar) - ($movimiento->vrdescuento); 
-        $pdf = new Fpdf('P','mm',array(82,300));
+        $pdf = new Fpdf('P','mm',array(58,265));
         $pdf->AliasNbPages();
         $pdf->AddPage();
         $maxHeight = $pdf->h;
@@ -323,149 +344,142 @@ class MovimientosController extends Controller
         }
 
         $pdf->SetLineWidth(1);
-        $pdf->Line($maxWidth*0.06, $pdf->getY(), $maxWidth*0.93, $pdf->getY());
+        $pdf->Line($maxWidth*0.06, $pdf->getY()-7, $maxWidth*0.93, $pdf->getY()-7);
         
-        $pdf->setY(7);
+        $pdf->setY(1);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 16);
+        $pdf->SetFont('Arial', 'B', 8);
         $pdf->Cell($maxWidth*0.88, $cellHeightHeader,$empresa->nombre,0,0,'C');
 
         $pdf->setY($pdf->getY() + 5);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 12);
-        $pdf->Cell($maxWidth*0.88, $cellHeightHeader,"NIT. ".$empresa->nit,0,0,'C');
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->Cell($maxWidth*0.88, $cellHeightHeader,"NIT. ".$empresa->nit.'-'.$empresa->dv,0,0,'C');
 
         $pdf->setY($pdf->getY() + 5);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->SetFont('Arial', 'B', 8);
         $pdf->Cell($maxWidth*0.88, $cellHeightHeader,$empresa->direccion,0,0,'C');
 
         $pdf->setY($pdf->getY() + 5);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->SetFont('Arial', 'B', 8);
         $pdf->Cell($maxWidth*0.88, $cellHeightHeader,Auth::user()->sede->nsede,0,0,'C');
 
         $pdf->Line($maxWidth*0.06, $pdf->getY() + 11, $maxWidth*0.93, $pdf->getY() + 11);
 
         foreach ($tarifas as $tarifa) {
-            $txttarifas .= $tarifa->ntarifa.'-'.$tarifa->vrtarifa.' ';
+            $txttarifas .= $tarifa->ntarifa.'- $'.$tarifa->vrtarifa.' ';
         }
         foreach ($tipovehiculos as $tipovehiculo) {
             $txttipovehiculo .= $tipovehiculo->detalle.' ';
         }
         $pdf->setY($pdf->getY() + 8);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 10);
+        $pdf->SetFont('Arial', 'B', 9);
         $pdf->Cell($maxWidth*0.88, $cellHeightHeader,utf8_decode('TIQUETE SALIDA Nº ').$consecutivofc->value_text.str_pad($movimiento->cmovi,7, 0, STR_PAD_LEFT),0,0,'C');
         $pdf->Ln(3);
 
         $pdf->setY($pdf->getY() + 10);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 36);
+        $pdf->SetFont('Arial', 'B', 30);
         $pdf->Cell($maxWidth*0.88, $cellHeightHeader,mb_strtoupper($movimiento->placa),0,0,'C');
 
         $pdf->SetLineWidth(1);
-        $pdf->Line($maxWidth*0.06, $pdf->getY() + 17, $maxWidth*0.33, $pdf->getY() + 17);
+        $pdf->Line($maxWidth*0.06, $pdf->getY() + 17, $maxWidth*0.3, $pdf->getY() + 17);
 
         $pdf->setY($pdf->getY() + 10);
-        $pdf->SetFont('Arial', 'B', 12);
-        $pdf->cell($maxWidth*0.74, $cellHeightHeader,'ENTRADA',0,0,'C');
+        $pdf->SetFont('Arial', 'B', 10);
+        $pdf->cell($maxWidth*0.67, $cellHeightHeader,'ENTRADA',0,0,'C');
 
-        $pdf->Line($maxWidth*0.65, $pdf->getY()+7, $maxWidth*0.93, $pdf->getY()+7);
+        $pdf->Line($maxWidth*0.7, $pdf->getY()+7, $maxWidth*0.93, $pdf->getY()+7);
 
         $pdf->Line($maxWidth*0.058, $pdf->getY()+50, $maxWidth*0.06, $pdf->getY()+7);
-        $pdf->Line($maxWidth*0.93, $pdf->getY()+50, $maxWidth*0.93, $pdf->getY()+7);
+        $pdf->Line($maxWidth*0.94, $pdf->getY()+50, $maxWidth*0.94, $pdf->getY()+7);
 
         $pdf->setY($pdf->getY() + 10);
-        $pdf->setX($maxWidth*0.20);
-        $pdf->SetFont('Arial', '', 12);
+        $pdf->setX($maxWidth*0.13);
+        $pdf->SetFont('Arial', '', 9);
         $pdf->Cell($maxWidth*0.34, $cellHeightHeader,'FECHA',0,0,'L');
-        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->SetFont('Arial', 'B', 9);
         $pdf->Cell($maxWidth*0.54, $cellHeightHeader,$fhentrada[0],0,0,'L');
 
         $pdf->setY($pdf->getY() + 8);
-        $pdf->setX($maxWidth*0.20);
-        $pdf->SetFont('Arial', '', 12);
+        $pdf->setX($maxWidth*0.13);
+        $pdf->SetFont('Arial', '', 9);
         $pdf->Cell($maxWidth*0.34, $cellHeightHeader,'HORA',0,0,'L');
-        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->SetFont('Arial', 'B', 9);
         $pdf->Cell($maxWidth*0.54, $cellHeightHeader,$fhentrada[1],0,0,'L');
         
         //ENTRADA
 
         $pdf->SetLineWidth(1);
-        $pdf->Line($maxWidth*0.06, $pdf->getY() + 15, $maxWidth*0.35, $pdf->getY() + 15);
+        $pdf->Line($maxWidth*0.06, $pdf->getY() + 15, $maxWidth*0.32, $pdf->getY() + 15);
 
         $pdf->setY($pdf->getY() + 8);
-        $pdf->SetFont('Arial', 'B', 12);
-        $pdf->cell($maxWidth*0.73, $cellHeightHeader,'SALIDA',0,0,'C');
+        $pdf->SetFont('Arial', 'B', 10);
+        $pdf->cell($maxWidth*0.65, $cellHeightHeader,'SALIDA',0,0,'C');
 
-        $pdf->Line($maxWidth*0.62, $pdf->getY()+7, $maxWidth*0.93, $pdf->getY()+7);
+        $pdf->Line($maxWidth*0.68, $pdf->getY()+7, $maxWidth*0.94, $pdf->getY()+7);
 
         $pdf->Line($maxWidth*0.058, $pdf->getY()+50, $maxWidth*0.06, $pdf->getY()+7);
-        $pdf->Line($maxWidth*0.93, $pdf->getY()+50, $maxWidth*0.93, $pdf->getY()+7);
+        $pdf->Line($maxWidth*0.94, $pdf->getY()+50, $maxWidth*0.94, $pdf->getY()+7);
 
         $pdf->setY($pdf->getY() + 10);
-        $pdf->setX($maxWidth*0.20);
-        $pdf->SetFont('Arial', '', 12);
+        $pdf->setX($maxWidth*0.13);
+        $pdf->SetFont('Arial', '', 9);
         $pdf->Cell($maxWidth*0.34, $cellHeightHeader,'FECHA',0,0,'L');
-        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->SetFont('Arial', 'B', 9);
         $pdf->Cell($maxWidth*0.54, $cellHeightHeader,$fhsalida[0],0,0,'L');
 
         $pdf->setY($pdf->getY() + 8);
-        $pdf->setX($maxWidth*0.20);
-        $pdf->SetFont('Arial', '', 12);
+        $pdf->setX($maxWidth*0.13);
+        $pdf->SetFont('Arial', '', 9);
         $pdf->Cell($maxWidth*0.34, $cellHeightHeader,'HORA',0,0,'L');
-        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->SetFont('Arial', 'B', 9);
         $pdf->Cell($maxWidth*0.54, $cellHeightHeader,$fhsalida[1],0,0,'L');
         
         $pdf->SetLineWidth(1);
-        $pdf->Line($maxWidth*0.06, $pdf->getY() + 15, $maxWidth*0.35, $pdf->getY() + 15);
+        $pdf->Line($maxWidth*0.06, $pdf->getY() + 15, $maxWidth*0.32, $pdf->getY() + 15);
 
         $pdf->setY($pdf->getY() + 8);
-        $pdf->SetFont('Arial', 'B', 12);
-        $pdf->cell($maxWidth*0.72, $cellHeightHeader,'TIEMPO',0,0,'C');
+        $pdf->SetFont('Arial', 'B', 10);
+        $pdf->cell($maxWidth*0.66, $cellHeightHeader,'TIEMPO',0,0,'C');
 
-        $pdf->Line($maxWidth*0.62, $pdf->getY()+7, $maxWidth*0.93, $pdf->getY()+7);
+        $pdf->Line($maxWidth*0.68, $pdf->getY()+7, $maxWidth*0.94, $pdf->getY()+7);
 
         $pdf->Line($maxWidth*0.058, $pdf->getY()+35, $maxWidth*0.06, $pdf->getY()+7);
-        $pdf->Line($maxWidth*0.93, $pdf->getY()+35, $maxWidth*0.93, $pdf->getY()+7);
+        $pdf->Line($maxWidth*0.94, $pdf->getY()+35, $maxWidth*0.94, $pdf->getY()+7);
 
         $pdf->setY($pdf->getY() + 5);
         $pdf->setX($maxWidth*0.13);
-        $pdf->SetFont('Arial', '', 10);
-        $pdf->Cell($maxWidth*0.34, $cellHeightHeader,'DIAS',0,0,'L');
-        $pdf->SetFont('Arial', 'B', 12);
-        $pdf->Cell($maxWidth*0.54, $cellHeightHeader,$tiempo[0],0,0,'C');
-        
-        $pdf->setY($pdf->getY() + 8);
-        $pdf->setX($maxWidth*0.13);
-        $pdf->SetFont('Arial', '', 10);
+        $pdf->SetFont('Arial', '', 9);
         $pdf->Cell($maxWidth*0.34, $cellHeightHeader,'HORAS',0,0,'L');
-        $pdf->SetFont('Arial', 'B', 12);
-        $pdf->Cell($maxWidth*0.54, $cellHeightHeader,$tiempo[1],0,0,'C');
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->Cell($maxWidth*0.54, $cellHeightHeader,$tiempo[0],0,0,'C');
 
         $pdf->setY($pdf->getY() + 8);
         $pdf->setX($maxWidth*0.13);
-        $pdf->SetFont('Arial', '', 10);
+        $pdf->SetFont('Arial', '', 9);
         $pdf->Cell($maxWidth*0.34, $cellHeightHeader,'MINUTOS',0,0,'L');
-        $pdf->SetFont('Arial', 'B', 12);
-        $pdf->Cell($maxWidth*0.54, $cellHeightHeader,$tiempo[2],0,0,'C');       
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->Cell($maxWidth*0.54, $cellHeightHeader,$tiempo[1],0,0,'C');       
 
         $pdf->SetLineWidth(1);
-        $pdf->Line($maxWidth*0.06, $pdf->getY() + 15, $maxWidth*0.25, $pdf->getY() + 15);
+        $pdf->Line($maxWidth*0.06, $pdf->getY() + 15, $maxWidth*0.22, $pdf->getY() + 15);
 
         $pdf->setY($pdf->getY() + 8);
-        $pdf->SetFont('Arial', 'B', 12);
-        $pdf->cell($maxWidth*0.765, $cellHeightHeader,'VALOR A PAGAR',0,0,'C');
+        $pdf->SetFont('Arial', 'B', 10);
+        $pdf->cell($maxWidth*0.68, $cellHeightHeader,'VALOR A PAGAR',0,0,'C');
 
-        $pdf->Line($maxWidth*0.755, $pdf->getY()+7, $maxWidth*0.93, $pdf->getY()+7);
+        $pdf->Line($maxWidth*0.8, $pdf->getY()+7, $maxWidth*0.94, $pdf->getY()+7);
 
         $pdf->Line($maxWidth*0.058, $pdf->getY()+52, $maxWidth*0.06, $pdf->getY()+7);
-        $pdf->Line($maxWidth*0.93, $pdf->getY()+52, $maxWidth*0.93, $pdf->getY()+7);
+        $pdf->Line($maxWidth*0.94, $pdf->getY()+52, $maxWidth*0.94, $pdf->getY()+7);
         
         $pdf->setY($pdf->getY() + 8);
         $pdf->setX($maxWidth*0.1);
-        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->SetFont('Arial', 'B', 10);
         $pdf->Cell($maxWidth*0.79, $cellHeightHeader,number_format($vrtotal,0),0,0,'C'); 
 
 
@@ -498,28 +512,38 @@ class MovimientosController extends Controller
         $pdf->setX($maxWidth*0.36);
         $pdf->Cell($maxWidth*0.75, $cellHeightHeader,$cortesia,0,0,'C');
 
-        $pdf->Line($maxWidth*0.06, $pdf->getY() + 15, $maxWidth*0.93, $pdf->getY() + 15);
-
-        $pdf->setY($pdf->getY() + 15);
+        $pdf->Line($maxWidth*0.06, $pdf->getY() + 15, $maxWidth*0.94, $pdf->getY() + 15);
+       
+        $pdf->setY($pdf->getY()+12); 
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', 'B', 12);
-        $pdf->Cell($maxWidth*0.88, $cellHeightHeader,mb_strtoupper($movimiento->tipovehiculo->ntipov.' - Tarifa: '.$movimiento->tarifa->ntarifa.' $'.$movimiento->tarifa->vrtarifa),0,0,'C');
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->Cell($maxWidth*0.88, $cellHeightHeader,mb_strtoupper('tarifa seleccionada'),0,0,'C');
 
-        $pdf->setY($pdf->getY() + 6);
+        $pdf->setY($pdf->getY()+3);
         $pdf->setX($maxWidth*0.06);
-        $pdf->SetFont('Arial', '', 8);
-        $pdf->Cell($maxWidth*0.88, $cellHeightHeader,$txttarifas,0,0,'C');
+        $pdf->SetFont('Arial', 'B', 7.5);
+        $pdf->Cell($maxWidth*0.88, $cellHeightHeader,mb_strtoupper($movimiento->tarifa->ntarifa.' ($'.$movimiento->tarifa->vrtarifa.")"),0,0,'C');
 
-        $pdf->Ln(8);
+        $pdf->setY($pdf->getY() + 13);
+        $pdf->setX($maxWidth*0.06);
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->Cell($maxWidth*0.88, 3,'TARIFAS',0,0,'C');
+        $pdf->Ln();
+        foreach ($tarifas as $tarifa) {
+            $pdf->setX($maxWidth*0.06);
+            $pdf->SetFont('Arial', '', 7.8);
+            $pdf->Cell($maxWidth*0.88, 3,$tarifa->ntarifa.':'.$tarifa->vrtarifa.' ',0,0,'C');
+            $pdf->Ln();
+        }
 
-
+        $pdf->Ln(1);
         foreach ($parametrosfooter as $parametro) {
-            $pdf->SetLineWidth(1.5);
-            $pdf->Line($maxWidth*0.06, $pdf->getY() + 5, $maxWidth*0.93, $pdf->getY() + 5);
+            $pdf->SetLineWidth(1);
+            $pdf->Line($maxWidth*0.06, $pdf->getY() + 5, $maxWidth*0.94, $pdf->getY() + 5);
             
             $pdf->setY($pdf->getY() + 8);
             $pdf->setX($maxWidth*0.06);
-            $pdf->SetFont('Arial', 'B', $parametro->value_int);
+            $pdf->SetFont('Arial', 'B', 9);
             $pdf->MultiCell($maxWidth*0.88,4,utf8_decode($parametro->value_text),0,'C',0);
 
         }
@@ -527,6 +551,75 @@ class MovimientosController extends Controller
         $this->renderPdf();
         $pdf->Close();        
     }
+    public function reportFechas($date1,$date2){
+        $movimientos = Movimientos::all();
+        //var_dump($movimientos);exit();
+        $empresa = Empresas::first();
+        $tarifas = Tarifas::all();
+        $suma = 0;
+        $pdf = new Fpdf('P','mm','letter');
+        $pdf->AliasNbPages();
+        $pdf->AddPage();
+        $maxHeight = $pdf->h;
+        $maxWidth = $pdf->w;
+
+        $pdf->SetFont('Courier', 'B', 14);
+        $pdf->Cell($maxWidth*0.92, 3,$empresa->nombre,0,0,'C');
+        $pdf->SetFont('Courier', 'B', 9);
+        $pdf->Ln(5);
+        $pdf->Cell($maxWidth*0.92, 3,'NIT.'.$empresa->nit,0,0,'C');        
+        $pdf->SetFont('Courier', 'B', 10);
+        $pdf->Ln(5);
+        $pdf->Cell($maxWidth*0.92, 3,'REPORTE DE SALIDAS POR FECHAS',0,0,'C');
+        $pdf->Ln(5);
+        $pdf->Cell($maxWidth*0.92, 3,'DESDE '.$date1.' - HASTA '.$date2,0,0,'C');
+
+        $pdf->setY($pdf->getY()+10);
+        $pdf->setX(1.5);
+        $pdf->SetFont('Courier', 'B', 8);
+        $pdf->Cell($maxWidth*0.0237, 5,'It',1,0,'C');
+        $pdf->Cell($maxWidth*0.0637, 5,'Placa',1,0,'C');
+        $pdf->Cell($maxWidth*0.1537, 5,'Fecha Entrada',1,0,'C');
+        $pdf->Cell($maxWidth*0.1537, 5,'Fecha Salida',1,0,'C');
+        $pdf->Cell($maxWidth*0.1147, 5,'Tiempo(D,H,M)',1,0,'C');
+        $pdf->Cell($maxWidth*0.1137, 5,'Tarifa',1,0,'C');
+        $pdf->Cell($maxWidth*0.0737, 5,'Cortesia',1,0,'C');
+        $pdf->Cell($maxWidth*0.1037, 5,'Vr.Calculado',1,0,'C');
+        $pdf->Cell($maxWidth*0.1037, 5,'Vr.Descuento',1,0,'C');
+        $pdf->Cell($maxWidth*0.0837, 5,'Vr.Pagado',1,0,'C');
+
+        $pdf->SetFont('Courier', '', 7.5);
+        foreach ($movimientos->getIterator() as $i => $movimiento) {
+            $salida = explode(" ", $movimiento->fhsalida);
+            if($salida[0] >= $date1 && $salida[0] <= $date2){
+                $pdf->Ln();
+                $pdf->setX(1.5);
+                $pdf->Cell($maxWidth*0.0237, 5,$i+1,1,0,'C');
+                $pdf->Cell($maxWidth*0.0637, 5,$movimiento->placa,1,0,'C');
+                $pdf->Cell($maxWidth*0.1537, 5,$movimiento->fhentrada,1,0,'C');
+                $pdf->Cell($maxWidth*0.1537, 5,$movimiento->fhsalida,1,0,'C');
+                $pdf->Cell($maxWidth*0.1147, 5,$movimiento->tiempo,1,0,'C');
+                $pdf->Cell($maxWidth*0.1137, 5,$movimiento->tarifa->ntarifa,1,0,'C');
+                if($movimiento->cortesia){
+                    $pdf->Cell($maxWidth*0.0737, 5,'Si',1,0,'C');
+                }else{
+                    $pdf->Cell($maxWidth*0.0737, 5,'No',1,0,'C');
+                }
+                $pdf->Cell($maxWidth*0.1037, 5,'$ '.number_format($movimiento->vrpagar,0),1,0,'C');
+                $pdf->Cell($maxWidth*0.1037, 5,'$ '.number_format($movimiento->vrdescuento,0),1,0,'C');
+                $pdf->Cell($maxWidth*0.0837, 5,'$ '.number_format($movimiento->vrpagar - $movimiento->vrdescuento,0),1,0,'R');
+                $suma +=$movimiento->vrpagar - $movimiento->vrdescuento; 
+            }
+        }
+        $pdf->Ln();
+        $pdf->setX(1.5);     
+        $pdf->SetFont('Courier', 'B', 9);
+        $pdf->Cell($maxWidth*0.9045, 5,'TOTAL',1,0,'C');
+        $pdf->Cell($maxWidth*0.0837, 5,'$ '.number_format($suma,0),1,0,'R');
+        $pdf->Output();
+        $this->renderPdf();
+        $pdf->Close();   
+    }    
     public function renderPdf(){
         header('Content-Type: application/pdf');
         header("Expires: Tue, 03 Jul 2001 06:00:00 GMT");

@@ -6,6 +6,7 @@ import SelectSeat from './SelectSeat.vue';
 import SelectRoles from './SelectRol.vue';
 import moment from 'moment';
 import momentz from 'moment-timezone';
+import Datepicker from 'vuejs-datepicker';
 import $ from 'jquery';
 import 'datatables.net';
 window.$ = $;
@@ -19,9 +20,15 @@ var app = new Vue({
     SelectTyve,
     SelectSeat,
     SelectRoles,
+    Datepicker
   },
   data: {
     tarifas:[],
+    reportDate : {
+        Date1:'',
+        Date2:'',
+    },
+    params:[],
     tipovehiculo:[],
     sedes:[],
     movimientos:[],
@@ -60,7 +67,8 @@ var app = new Vue({
     GenOutTime(){
       this.salida.fhsalida = momentz.tz(moment(), "America/Bogota").format('YYYY-MM-DD HH:mm:ss');
       this.setTime()
-      this.salida.placa = this.slugify(this.salida.placa)
+      this.salida.placa = this.slugify(this.salida.placa
+        )
     },
     CreateEntrada(){
         this._token = $('form').find("input").val()
@@ -140,6 +148,31 @@ var app = new Vue({
           alertify.error('Error al crear la salida')
         })
     },
+    saveParams(){
+        this._token = $('form').find("input").val()
+        var params = $('form').serialize()
+        console.log(params)    
+        fetch("/movimientos/params",{
+          credentials: 'include',
+          method : "POST",
+          type: "POST",
+          headers: {
+            'Accept': 'application/json, application/xml, text/plain, text/html, *.*',
+            'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+            'X-CSRF-TOKEN' : this._token,
+          },
+          body: params,
+        })
+        .then(response => {
+          return response.json();
+        })
+        .then(response => {
+          alertify.success('Guardado Exitoso')
+        })
+        .catch(function(error) {
+          alertify.error('Error al guardar los parametros')
+        })        
+    },
     getTariff(){
       fetch("/api/tarifas",{
         credentials: 'include',
@@ -151,6 +184,17 @@ var app = new Vue({
         this.tarifas = tarifas
         this.entrada.ctarifa = "1"
         this.salida.ctarifa = "1"
+      });
+    },
+    getParams(){
+      fetch("/api/params",{
+        credentials: 'include',
+        type : "GET",
+      })
+      .then(response => {
+        return response.json()
+      }).then(params => {
+        this.params = params
       });
     },
     getTyve(){
@@ -266,7 +310,7 @@ var app = new Vue({
       var hours=("0"+ hour ).slice(-2)
       var minutes=("0"+ minute ).slice(-2)
       
-        this.salida.tiempo = ""+days+ ":" +hours + ":" +minutes;
+        this.salida.tiempo = hours + ":" +minutes;
       }else{
         alertify.error("no generada la hora de salida");
       }
@@ -294,6 +338,7 @@ var app = new Vue({
         console.log(vrpagar)
         this.salida.vrpagar = currencyFormat.format(vrpagar.obj)
         this.salida.vrtotal = currencyFormat.format(vrpagar.obj)
+        this.salida.vrdescuento = currencyFormat.format(0)
       });
     },
     setDescu(){
@@ -328,13 +373,25 @@ var app = new Vue({
     },
     list(){
       $('#table').DataTable().destroy();
-      $('#table').DataTable();
+      $('#table').DataTable({
+            "paging": false,
+            "ordering": false,
+            "searching": false,
+            "info": false,
+      });
+    },
+    dataReport(){
+      this.reportDate.Date1 = moment(this.reportDate.Date1).format('YYYY-MM-DD')
+      this.reportDate.Date2 = moment(this.reportDate.Date2).format('YYYY-MM-DD')
+      var url = '/movimientos/list/report/'+this.reportDate.Date1+'/'+this.reportDate.Date2
+      window.open(url)
     }
   },
   mounted(){
     this.getSeat()
     this.getTyve()
     this.getTariff()
+    this.getParams()
     this.getRoles()
     this.getMovimientos()
 

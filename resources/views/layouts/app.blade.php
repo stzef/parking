@@ -20,6 +20,9 @@
             text-decoration: none;
             color: initial;
         }
+        a{
+          font-size: 18px;
+        }
         .placa{
             text-transform: uppercase;
         }
@@ -29,7 +32,13 @@
           width: 90px;
           height: 34px;
         }
-
+        .clock {
+          background-color: #263238;
+          color: #eceff1;
+          padding: .3rem .6rem;
+          font-size: 5rem;
+          font-family: 'Menlo', monospace;
+        }
         .switch input {display:none;}
 
         .slider {
@@ -109,6 +118,12 @@
 
         .slider.round:before {
           border-radius: 50%;}
+        input, select {
+            padding: .75em .5em;
+            font-size: 100%;
+            border: 1px solid #ccc;
+            width: 100%
+        }
     </style>
 </head>
 <body>
@@ -179,8 +194,8 @@
                             <li><a href="{{URL::route('entrada')}}" class="btn btn-block"><i class="glyphicon glyphicon-upload"></i>   ENTRADA</a></li>
                             <li><a href="{{URL::route('salida')}}" class="btn btn-block"><i class="glyphicon glyphicon-download"></i> SALIDA</a></li>
                             @role('admin') 
-                                <li><a href="{{URL::route('lista')}}" class="btn btn-block" @click="list()"><i class="glyphicon glyphicon-list-alt"></i> LISTADO POR FECHAS </a></li>
-                                <li><a href="{{URL::route('lista')}}" class="btn btn-block" @click="list()"><i class="glyphicon glyphicon-list-alt"></i> LISTADO POR HORAS </a></li>
+                                <li><a href="{{URL::route('lista')}}" class="btn btn-block" @click="list()"><i class="glyphicon glyphicon-list-alt"></i> SALIDAS POR FECHAS </a></li>
+                                <li><a href="{{URL::route('config')}}" class="btn btn-block" @click="list()"><i class="glyphicon glyphicon-list-alt"></i> CONFIGURACION </a></li>
                             @endrole
                         </ul>
                     <hr>

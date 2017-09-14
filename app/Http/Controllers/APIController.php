@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use \App\Models\Empresas;
 use \App\Models\Movimientos;
+use \App\Models\Parametros;
 use \App\Models\Users;
 use \App\Models\Sedes;
 use \App\Models\Tarifas;
@@ -21,6 +22,10 @@ class APIController extends Controller{
 	public function sedes(Request $request){
 		$sedes = Sedes::all();
 		return response()->json($sedes->toArray());
+	}
+	public function params(Request $request){
+		$params = Parametros::all();
+		return response()->json($params->toArray());
 	}
 	public function roles(Request $request){
 		$roles = \HttpOz\Roles\Models\Role::all();
