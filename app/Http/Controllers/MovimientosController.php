@@ -52,6 +52,7 @@ class MovimientosController extends Controller
     }
     public function setTime(Request $request){
         $dataBody = $request->all();
+        var_dump($dataBody);exit();
         $parametro = Parametros::where('id',6)->first();
         $datetime1 = new DateTime($dataBody['salida']['fhentrada']);
         $datetime2 = new DateTime($dataBody['salida']['fhsalida']);
@@ -552,11 +553,13 @@ class MovimientosController extends Controller
         $pdf->Close();        
     }
     public function reportFechas($date1,$date2){
-        $movimientos = Movimientos::all();
+        $movimientos = Movimientos::all()->sortBy('');
         //var_dump($movimientos);exit();
         $empresa = Empresas::first();
         $tarifas = Tarifas::all();
-        $suma = 0;
+        $sumaVP = 0;
+        $sumaVD = 0;
+        $sumaVC = 0;
         $pdf = new Fpdf('P','mm','letter');
         $pdf->AliasNbPages();
         $pdf->AddPage();
@@ -564,15 +567,15 @@ class MovimientosController extends Controller
         $maxWidth = $pdf->w;
 
         $pdf->SetFont('Courier', 'B', 14);
-        $pdf->Cell($maxWidth*0.92, 3,$empresa->nombre,0,0,'C');
+        $pdf->Cell($maxWidth*0.935, 3,$empresa->nombre,0,0,'C');
         $pdf->SetFont('Courier', 'B', 9);
         $pdf->Ln(5);
-        $pdf->Cell($maxWidth*0.92, 3,'NIT.'.$empresa->nit,0,0,'C');        
+        $pdf->Cell($maxWidth*0.935, 3,'NIT.'.$empresa->nit,0,0,'C');        
         $pdf->SetFont('Courier', 'B', 10);
         $pdf->Ln(5);
-        $pdf->Cell($maxWidth*0.92, 3,'REPORTE DE SALIDAS POR FECHAS',0,0,'C');
+        $pdf->Cell($maxWidth*0.935, 3,'REPORTE DE SALIDAS POR FECHAS',0,0,'C');
         $pdf->Ln(5);
-        $pdf->Cell($maxWidth*0.92, 3,'DESDE '.$date1.' - HASTA '.$date2,0,0,'C');
+        $pdf->Cell($maxWidth*0.935, 3,'DESDE '.$date1.' - HASTA '.$date2,0,0,'C');
 
         $pdf->setY($pdf->getY()+10);
         $pdf->setX(1.5);
@@ -581,41 +584,45 @@ class MovimientosController extends Controller
         $pdf->Cell($maxWidth*0.0637, 5,'Placa',1,0,'C');
         $pdf->Cell($maxWidth*0.1537, 5,'Fecha Entrada',1,0,'C');
         $pdf->Cell($maxWidth*0.1537, 5,'Fecha Salida',1,0,'C');
-        $pdf->Cell($maxWidth*0.1147, 5,'Tiempo(D,H,M)',1,0,'C');
+        $pdf->Cell($maxWidth*0.1047, 5,'Tiempo(H,M)',1,0,'C');
         $pdf->Cell($maxWidth*0.1137, 5,'Tarifa',1,0,'C');
         $pdf->Cell($maxWidth*0.0737, 5,'Cortesia',1,0,'C');
         $pdf->Cell($maxWidth*0.1037, 5,'Vr.Calculado',1,0,'C');
         $pdf->Cell($maxWidth*0.1037, 5,'Vr.Descuento',1,0,'C');
-        $pdf->Cell($maxWidth*0.0837, 5,'Vr.Pagado',1,0,'C');
+        $pdf->Cell($maxWidth*0.0937, 5,'Vr.Pagado',1,0,'C');
 
         $pdf->SetFont('Courier', '', 7.5);
         foreach ($movimientos->getIterator() as $i => $movimiento) {
             $salida = explode(" ", $movimiento->fhsalida);
-            if($salida[0] >= $date1 && $salida[0] <= $date2){
+            if($salida[0] >= $date1 && $salida[0] <= $date2 && $movimiento->ctimovi != 3){
                 $pdf->Ln();
                 $pdf->setX(1.5);
                 $pdf->Cell($maxWidth*0.0237, 5,$i+1,1,0,'C');
                 $pdf->Cell($maxWidth*0.0637, 5,$movimiento->placa,1,0,'C');
                 $pdf->Cell($maxWidth*0.1537, 5,$movimiento->fhentrada,1,0,'C');
                 $pdf->Cell($maxWidth*0.1537, 5,$movimiento->fhsalida,1,0,'C');
-                $pdf->Cell($maxWidth*0.1147, 5,$movimiento->tiempo,1,0,'C');
+                $pdf->Cell($maxWidth*0.1047, 5,$movimiento->tiempo,1,0,'C');
                 $pdf->Cell($maxWidth*0.1137, 5,$movimiento->tarifa->ntarifa,1,0,'C');
                 if($movimiento->cortesia){
                     $pdf->Cell($maxWidth*0.0737, 5,'Si',1,0,'C');
                 }else{
                     $pdf->Cell($maxWidth*0.0737, 5,'No',1,0,'C');
                 }
-                $pdf->Cell($maxWidth*0.1037, 5,'$ '.number_format($movimiento->vrpagar,0),1,0,'C');
-                $pdf->Cell($maxWidth*0.1037, 5,'$ '.number_format($movimiento->vrdescuento,0),1,0,'C');
-                $pdf->Cell($maxWidth*0.0837, 5,'$ '.number_format($movimiento->vrpagar - $movimiento->vrdescuento,0),1,0,'R');
-                $suma +=$movimiento->vrpagar - $movimiento->vrdescuento; 
+                $pdf->Cell($maxWidth*0.1037, 5,'$ '.number_format($movimiento->vrpagar,0),1,0,'R');
+                $pdf->Cell($maxWidth*0.1037, 5,'$ '.number_format($movimiento->vrdescuento,0),1,0,'R');
+                $pdf->Cell($maxWidth*0.0937, 5,'$ '.number_format($movimiento->vrpagar - $movimiento->vrdescuento,0),1,0,'R');
+                $sumaVP +=$movimiento->vrpagar - $movimiento->vrdescuento; 
+                $sumaVC +=$movimiento->vrpagar; 
+                $sumaVD +=$movimiento->vrdescuento; 
             }
         }
         $pdf->Ln();
         $pdf->setX(1.5);     
         $pdf->SetFont('Courier', 'B', 9);
-        $pdf->Cell($maxWidth*0.9045, 5,'TOTAL',1,0,'C');
-        $pdf->Cell($maxWidth*0.0837, 5,'$ '.number_format($suma,0),1,0,'R');
+        $pdf->Cell($maxWidth*0.6869, 5,'TOTAL',1,0,'C');
+        $pdf->Cell($maxWidth*0.1037, 5,'$ '.number_format($sumaVC,0),1,0,'R');
+        $pdf->Cell($maxWidth*0.1037, 5,'$ '.number_format($sumaVD,0),1,0,'R');
+        $pdf->Cell($maxWidth*0.0937, 5,'$ '.number_format($sumaVP,0),1,0,'R');
         $pdf->Output();
         $this->renderPdf();
         $pdf->Close();   

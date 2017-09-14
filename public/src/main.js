@@ -260,7 +260,7 @@ var app = new Vue({
           this.salida.ctipov = this.movimiento[0]['ctipov']
           this.GenOutTime()
           this.setTime()
-          this.setVal(this.movimiento[0]['tarifa'])
+          this.setVal(this.movimiento[0]['ctarifa'])
       }); 
     },
     getMovimientos(){
@@ -318,7 +318,7 @@ var app = new Vue({
     setVal(tarifa){
       var data = {
         "salida" : this.salida,
-        "tarifa" : tarifa
+        "ctarifa" : ctarifa
       }
       data = $.param(data)
       fetch("/movimientos/time",{
