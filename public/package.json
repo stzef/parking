@@ -15,6 +15,7 @@
     "datatables.net-dt": "^1.10.15",
     "jquery": "^3.2.1",
     "moment": "^2.18.1",
+    "moment-timezone": "^0.5.13",
     "vue": "^2.3.4",
     "vue-datetime-picker": "^0.2.1",
     "vue-digital-clock": "^1.5.0",
