@@ -53,7 +53,8 @@ var app = new Vue({
       'tiempo' : '',
       'ctipov' : '',
       'cortesia': ''
-    }
+    },
+    "ctarifa":1,
   },
   watch: {
     'salida.ctarifa':function(){
@@ -94,7 +95,7 @@ var app = new Vue({
           this.entrada.ctarifa = 1
           this.entrada.placa = ''
           this.entrada.ctipov = 1
-          
+
           var url = 'entrada/ticket/'+response['obj']['cmovi']
           window.open(url)
 
@@ -124,10 +125,10 @@ var app = new Vue({
           },
           body: salida,
         })
-        .then(response => {  
+        .then(response => {
           return response.json();
         })
-        .then(response => {  
+        .then(response => {
           alertify.success('salida Exitosa')
           $("#"+this.salida.cmovi).attr("hidden","false");
           var url = 'salida/ticket/'+this.salida.cmovi
@@ -142,16 +143,16 @@ var app = new Vue({
           this.salida.fhentrada = ''
           this.salida.ctarifa = 1
           this.salida.ctipov = 1
-          window.open(url)        
+          window.open(url)
         })
-        .catch(function(error) {  
+        .catch(function(error) {
           alertify.error('Error al crear la salida')
         })
     },
     saveParams(){
         this._token = $('form').find("input").val()
         var params = $('form').serialize()
-        console.log(params)    
+        console.log(params)
         fetch("/movimientos/params",{
           credentials: 'include',
           method : "POST",
@@ -171,7 +172,7 @@ var app = new Vue({
         })
         .catch(function(error) {
           alertify.error('Error al guardar los parametros')
-        })        
+        })
     },
     getTariff(){
       fetch("/api/tarifas",{
@@ -208,7 +209,7 @@ var app = new Vue({
         this.tipovehiculo = tipovehiculo
         this.entrada.ctipov = "1"
         this.salida.ctipov = "1"
-      });      
+      });
     },
     getSeat(){
       fetch("/api/sedes",{
@@ -219,7 +220,7 @@ var app = new Vue({
         return response.json()
       }).then(sedes => {
         this.sedes = sedes
-      });  
+      });
     },
     getRoles(){
       fetch("/api/roles",{
@@ -230,13 +231,13 @@ var app = new Vue({
         return response.json()
       }).then(roles => {
         this.roles = roles
-      });  
+      });
     },
     getMovimiento(placa){
       this._token = $('form').find("input").val()
       var dat = {
         "placa" : placa
-      }     
+      }
       var data = $.param(dat)
       fetch("/api/movimientos",{
         credentials: 'include',
@@ -261,7 +262,7 @@ var app = new Vue({
           this.GenOutTime()
           this.setTime()
           this.setVal(this.movimiento[0]['ctarifa'])
-      }); 
+      });
     },
     getMovimientos(){
       this._token = $('form').find("input").val()
@@ -296,7 +297,7 @@ var app = new Vue({
       this.salida.ctipov = this.movimiento.ctipov
       this.GenOutTime()
       this.setTime()
-      this.setVal(this.movimiento.tarifa)
+      this.setVal(this.movimiento.ctarifa)
     },
     setTime(){
       if(app.salida.fhsalida){
@@ -309,7 +310,7 @@ var app = new Vue({
       var days=("0"+ day ).slice(-2)
       var hours=("0"+ hour ).slice(-2)
       var minutes=("0"+ minute ).slice(-2)
-      
+
         this.salida.tiempo = hours + ":" +minutes;
       }else{
         alertify.error("no generada la hora de salida");
@@ -318,8 +319,9 @@ var app = new Vue({
     setVal(tarifa){
       var data = {
         "salida" : this.salida,
-        "ctarifa" : ctarifa
+        "ctarifa" : tarifa
       }
+      console.log(data)
       data = $.param(data)
       fetch("/movimientos/time",{
         credentials: 'include',
@@ -352,7 +354,7 @@ var app = new Vue({
         this.salida.vrtotal = currencyFormat.format(this.salida.vrtotal)
       }else{
         this.salida.vrdescuento = currencyFormat.format(0)
-        this.setValtotal()        
+        this.setValtotal()
       }
     },
     setValtotal(){

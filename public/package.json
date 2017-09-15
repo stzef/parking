@@ -21,7 +21,7 @@
     "vue-digital-clock": "^1.5.0",
     "vue-search-select": "^2.3.9",
     "vuejs-date-picker": "^1.0.1",
-    "vuejs-datepicker": "^0.9.11"
+    "vuejs-datepicker": "^0.9.13"
   },
   "devDependencies": {
     "babel-core": "^6.0.0",

@@ -19,7 +19,7 @@ Auth::routes();
 
 Route::group(['prefix'=>'movimientos'], function(){
 	Route::group(['prefix' => 'entrada'], function(){
-		Route::get('/', 'MovimientosController@index')->name('entrada'); 
+		Route::get('/', 'MovimientosController@index')->name('entrada');
 		Route::get('/ticket/{cmovi}', "MovimientosController@ticketEntrada");
 		Route::post('/create','MovimientosController@createEntrada')->name('create');
 	});
@@ -29,12 +29,12 @@ Route::group(['prefix'=>'movimientos'], function(){
 		Route::post('/create','MovimientosController@createSalida')->name('create');
 	});
 	Route::group(['prefix' => 'list'], function(){
-		Route::get('/', 'MovimientosController@list')->name('lista');
+		Route::get('/', 'MovimientosController@lista')->name('lista');
 		Route::get('/report/{date1}/{date2}', 'MovimientosController@reportFechas');
 	});
 	Route::group(['prefix' => 'config'], function(){
 		Route::get('/', 'MovimientosController@config')->name('config');
-	});	
+	});
 	Route::post('/time','MovimientosController@setTime')->name('time');
 	Route::post('/params','MovimientosController@saveParams')->name('params');
 

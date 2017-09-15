@@ -16,7 +16,7 @@
                             <label for="" class="label-control col-md-12 text-center">Fecha y Hora de salida</label>
                             <div class="input-group">
                                 <input type="text" name="fhsalida" v-model="salida.fhsalida" class="form-control col-md-8" disabled required>
-                                <span class="input-group-btn"><button type="button" class="btn btn-default"  @click="GenOutTime()">Generar</button></span>                            
+                                <span class="input-group-btn"><button type="button" class="btn btn-default"  @click="GenOutTime()">Generar</button></span>
                             </div>
                         </div>
                         <div class="form-group col-md-6">
@@ -41,13 +41,15 @@
                         <div class="form-group col-md-6">
                             <label for="" class="label-control col-md-12 text-center">Tarifa</label>
                             <div class="col-md-12">
-                                <select-tariff id="ctarifa" requeried="true" :tarifas="tarifas" :obj="salida" disabled></select-tariff>
+                                <select v-model="salida.ctarifa" @change="setVal(salida.ctarifa)" name="tarifa" id="tarifa" class="form-control" required>
+                                    <option v-for="tarifa in tarifas" :value="tarifa.ctarifa">[[tarifa.ntarifa]] ( $ [[tarifa.vrtarifa]] )</option>
+                                </select>
                             </div>
                         </div>
                         <div class="form-group col-md-6">
                             <label for="" class="label-control col-md-12 text-center">Tipo de vehiculo</label>
                             <div class="col-md-12">
-                                <select-tyve id="ctipov" requeried="true" :tipovehiculo="tipovehiculo" :obj="salida" disabled></select-tyve>
+                                <select-tyve id="ctipov" requeried="true" :tipovehiculo="tipovehiculo" :obj="salida"></select-tyve>
                             </div>
                         </div>
                     </div>
@@ -68,7 +70,7 @@
                                             <span class="slider">
                                             <span class="on">SI</span><span class="off">NO</span>
                                             </span>
-                                        </label>                   
+                                        </label>
                                     </div>
                                 </span>
                             </div>
@@ -95,7 +97,7 @@
 
         <!-- Modal content-->
         <div class="modal-content">
-            
+
           <!-- Modal Header-->
           <div class="modal-header">
             <div class="col-md-10">
@@ -107,7 +109,7 @@
                 </center>
             </div>
           </div>
-          
+
           <!-- Modal Body-->
           <div class="modal-body">
                 <table class="table-responsive" id="table">
@@ -145,6 +147,6 @@
         </div>
 
       </div>
-    </div>    
+    </div>
 </template>
 @endsection

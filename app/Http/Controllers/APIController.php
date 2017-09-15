@@ -10,10 +10,15 @@ use \App\Models\Sedes;
 use \App\Models\Tarifas;
 use \App\Models\Timovi;
 use \App\Models\Tipovehiculo;
+use \Auth;
 class APIController extends Controller{
 	public function tarifas(Request $request){
-		$tarifas = Tarifas::all();
-		return response()->json($tarifas->toArray());
+		if( Auth::user()){
+			$tarifas = Tarifas::all();
+			return response()->json($tarifas->toArray());
+		}else{
+			return response()->json('');
+		}
 	}
 	public function tipovehiculo(Request $request){
 		$tipovehiculo = Tipovehiculo::all();
@@ -41,9 +46,9 @@ class APIController extends Controller{
 			$movimientosArr = $movimientos->toArray();
 		}
 		foreach ($movimientosArr as $i => $movimiento) {
-			$movimientosArr[$i]['tarifa'] = (Tarifas::where('ctarifa',$movimiento['ctarifa'])->first())->toArray();
-			$movimientosArr[$i]['tipovehiculo'] = (Tipovehiculo::where('ctipov',$movimiento['ctipov'])->first())->toArray();
-			$movimientosArr[$i]['timovi'] = (Timovi::where('ctimovi',$movimiento['ctimovi'])->first())->toArray();
+			$movimientosArr[$i]['tarifa'] = Tarifas::where('ctarifa',$movimiento['ctarifa'])->first()->toArray();
+			$movimientosArr[$i]['tipovehiculo'] = Tipovehiculo::where('ctipov',$movimiento['ctipov'])->first()->toArray();
+			$movimientosArr[$i]['timovi'] = Timovi::where('ctimovi',$movimiento['ctimovi'])->first()->toArray();
 		}
 		return response()->json($movimientosArr);
 	}
