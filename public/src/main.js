@@ -56,10 +56,6 @@ var app = new Vue({
     },
     "ctarifa":1,
   },
-  watch: {
-    'salida.ctarifa':function(){
-    }
-  },
   methods:{
     GenInTime(){
       this.entrada.fhentrada = momentz.tz(moment(), "America/Bogota").format('YYYY-MM-DD HH:mm:ss');
@@ -382,11 +378,25 @@ var app = new Vue({
             "info": false,
       });
     },
+    table(){
+      $('#table-tickets').DataTable().destroy();
+      $('#table-tickets').DataTable({
+            "paging": false,
+            "ordering": false,
+            "searching": false,
+            "info": false,
+      });
+    },
+    printTicket(tipo,cmovi){
+      var url = "/movimientos/"+tipo+"/ticket/"+cmovi
+      window.open(url)
+    },
     dataReport(){
       this.reportDate.Date1 = moment(this.reportDate.Date1).format('YYYY-MM-DD')
       this.reportDate.Date2 = moment(this.reportDate.Date2).format('YYYY-MM-DD')
       var url = '/movimientos/list/report/'+this.reportDate.Date1+'/'+this.reportDate.Date2
       window.open(url)
+
     }
   },
   mounted(){
@@ -396,6 +406,11 @@ var app = new Vue({
     this.getParams()
     this.getRoles()
     this.getMovimientos()
-
+    $('#table-tickets').DataTable({
+      "paging": false,
+      "ordering": false,
+      "searching": false,
+      "info": false,
+    });
   },
 })

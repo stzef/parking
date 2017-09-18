@@ -91,7 +91,7 @@
           font-size: 15px;
           font-family: Verdana, sans-serif;
         }
-        
+
         .off
         {
           color: white;
@@ -184,16 +184,17 @@
         </nav>
         @if(Auth::guest())
             @yield('content')
-        @else    
+        @else
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-3">
                         <center><Clock :blink="true" /></center>
                         <hr>
                         <ul class="nav nav-stacked">
-                            <li><a href="{{URL::route('entrada')}}" class="btn btn-block"><i class="glyphicon glyphicon-upload"></i>   ENTRADA</a></li>
-                            <li><a href="{{URL::route('salida')}}" class="btn btn-block"><i class="glyphicon glyphicon-download"></i> SALIDA</a></li>
-                            @role('admin') 
+                            <li><a href="{{URL::route('entrada')}}" class="btn btn-block"><i class="glyphicon glyphicon-upload"></i>   ENTRADA </a></li>
+                            <li><a href="{{URL::route('salida')}}" class="btn btn-block"><i class="glyphicon glyphicon-download"></i> SALIDA </a></li>
+                            <li><a href="{{URL::route('tickets')}}" class="btn btn-block" @click="table()"><i class="glyphicon glyphicon-list-alt"></i> LISTA DE FACTURAS </a></li>
+                            @role('admin')
                                 <li><a href="{{URL::route('lista')}}" class="btn btn-block" @click="list()"><i class="glyphicon glyphicon-list-alt"></i> SALIDAS POR FECHAS </a></li>
                                 <li><a href="{{URL::route('config')}}" class="btn btn-block" @click="list()"><i class="glyphicon glyphicon-list-alt"></i> CONFIGURACION </a></li>
                             @endrole

@@ -32,6 +32,9 @@ Route::group(['prefix'=>'movimientos'], function(){
 		Route::get('/', 'MovimientosController@lista')->name('lista');
 		Route::get('/report/{date1}/{date2}', 'MovimientosController@reportFechas');
 	});
+	Route::group(['prefix' => 'tickets'],function(){
+		Route::get('/', 'MovimientosController@tickets')->name('tickets');
+	});
 	Route::group(['prefix' => 'config'], function(){
 		Route::get('/', 'MovimientosController@config')->name('config');
 	});

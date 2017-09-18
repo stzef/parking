@@ -41,14 +41,22 @@ class MovimientosController extends Controller
     {
         return view('movimientos/salida');
     }
+
     public function lista()
     {
         return view('movimientos/list');
     }
+
+    public function tickets()
+    {
+        return view('movimientos/tickets');
+    }
+
     public function config()
     {
         return view('movimientos/config');
     }
+
     public function setTime(Request $request){
         $dataBody = $request->all();
         $parametro = Parametros::where('id',6)->first();
@@ -553,7 +561,7 @@ class MovimientosController extends Controller
         $pdf->Close();
     }
     public function reportFechas($date1,$date2){
-        $movimientos = Movimientos::all()->sortBy('');
+        $movimientos = Movimientos::all();
         //var_dump($movimientos);exit();
         $empresa = Empresas::first();
         $tarifas = Tarifas::all();
