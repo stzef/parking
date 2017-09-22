@@ -412,5 +412,6 @@ var app = new Vue({
       "searching": false,
       "info": false,
     });
+    $('.dataTables_empty').html("");
   },
 })
