@@ -378,15 +378,6 @@ var app = new Vue({
             "info": false,
       });
     },
-    table(){
-      $('#table-tickets').DataTable().destroy();
-      $('#table-tickets').DataTable({
-            "paging": false,
-            "ordering": false,
-            "searching": false,
-            "info": false,
-      });
-    },
     printTicket(tipo,cmovi){
       var url = "/movimientos/"+tipo+"/ticket/"+cmovi
       window.open(url)

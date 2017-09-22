@@ -17,8 +17,7 @@
 	            </tr>
 	        </thead>
 	        <tbody>
-	            <template v-for="movimiento in movimientos">
-	                <tr :id="movimiento.cmovi">
+	                <tr v-for="movimiento in movimientos" :id="movimiento.cmovi">
 	                        <td>[[movimiento.placa]]</td>
 	                        <td>[[movimiento.fhentrada]]</td>
 	                        <td v-if="movimiento.fhsalida" >[[movimiento.fhsalida]]</td>
@@ -33,7 +32,6 @@
 	                            <button class="btn btn-primary" @click="printTicket('salida',movimiento.cmovi)"  >Imprimir</button>
 	                        </td>
 	                </tr>
-	            </template>
 	        </tbody>
 	    </table>
     </div>
