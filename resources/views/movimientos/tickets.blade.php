@@ -21,7 +21,7 @@
 	                        <td>[[movimiento.placa]]</td>
 	                        <td>[[movimiento.fhentrada]]</td>
 	                        <td v-if="movimiento.fhsalida" >[[movimiento.fhsalida]]</td>
-	                        <td v-else>SIN SALIDA AUN</td>
+	                        <td v-else>SIN SALIDA</td>
 	                        <td>[[movimiento.tarifa.ntarifa]]</td>
 	                        <td>[[movimiento.tipovehiculo.ntipov]]</td>
 	                        <td>[[movimiento.timovi.ntimovi]]</td>
