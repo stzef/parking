@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Clock from 'vue-digital-clock';
+import vueble from 'vueble';
 import SelectTariff from './SelectTariff.vue';
 import SelectTyve from './SelectTyve.vue';
 import SelectSeat from './SelectSeat.vue';
@@ -20,7 +21,8 @@ var app = new Vue({
     SelectTyve,
     SelectSeat,
     SelectRoles,
-    Datepicker
+    Datepicker,
+    vueble
   },
   data: {
     tarifas:[],
@@ -28,6 +30,13 @@ var app = new Vue({
         Date1:'',
         Date2:'',
     },
+    columns: [
+      {
+        label: 'Placa',
+        field: 'Placa',
+        filterable: true,
+      },
+    ],
     params:[],
     tipovehiculo:[],
     sedes:[],
