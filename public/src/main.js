@@ -8,6 +8,7 @@ import SelectRoles from './SelectRol.vue';
 import moment from 'moment';
 import momentz from 'moment-timezone';
 import Datepicker from 'vuejs-datepicker';
+import DateTable from 'vue-flex-datatable';
 import $ from 'jquery';
 import 'datatables.net';
 window.$ = $;
@@ -22,21 +23,15 @@ var app = new Vue({
     SelectSeat,
     SelectRoles,
     Datepicker,
+    DateTable,
     vueble
   },
   data: {
-    tarifas:[],
-    reportDate : {
+   tarifas:[],
+   reportDate : {
         Date1:'',
         Date2:'',
     },
-    columns: [
-      {
-        label: 'Placa',
-        field: 'Placa',
-        filterable: true,
-      },
-    ],
     params:[],
     tipovehiculo:[],
     sedes:[],
@@ -64,6 +59,7 @@ var app = new Vue({
       'cortesia': ''
     },
     "ctarifa":1,
+    "days":[],
   },
   methods:{
     GenInTime(){
@@ -378,15 +374,6 @@ var app = new Vue({
         this.salida.vrtotal = currencyFormat.format(this.salida.vrtotal)
       }
     },
-    list(){
-      $('#table').DataTable().destroy();
-      $('#table').DataTable({
-            "paging": false,
-            "ordering": false,
-            "searching": false,
-            "info": false,
-      });
-    },
     printTicket(tipo,cmovi){
       var url = "/movimientos/"+tipo+"/ticket/"+cmovi
       window.open(url)
@@ -396,7 +383,26 @@ var app = new Vue({
       this.reportDate.Date2 = moment(this.reportDate.Date2).format('YYYY-MM-DD')
       var url = '/movimientos/list/report/'+this.reportDate.Date1+'/'+this.reportDate.Date2
       window.open(url)
-
+    },
+    getDays(){
+      fetch("/api/days",{
+        credentials: 'include',
+        type : "GET",
+      })
+      .then(response => {
+        return response.json()
+      }).then(days => {
+        this.days = days
+          if(this.days.m == 0 && this.days.d <= 5 && this.days.d > 0){
+            if($( ".message_initi" ).length ){
+              alertify.alert('Vencimiento de licencia','Su licencia vencera en '+days.d+' Dia(s) , comuniquese con <a href="http://sistematizar.co/" target="_blank"> SistematizarEF</a> para su renovación.')
+            }
+          }else if (this.days.m == 0 && this.days.d == 0) {
+            if($( ".message_initi" ).length ){
+              alertify.alert('Vencimiento de licencia','Su licencia se encuentra vencida , comuniquese con <a href="http://sistematizar.co/" target="_blank"> SistematizarEF</a> para su renovación.')
+            }
+          }
+      });
     }
   },
   mounted(){
@@ -405,13 +411,7 @@ var app = new Vue({
     this.getTariff()
     this.getParams()
     this.getRoles()
+    this.getDays()
     this.getMovimientos()
-    $('#table-tickets').DataTable({
-      "paging": false,
-      "ordering": false,
-      "searching": false,
-      "info": false,
-    });
-    $('.dataTables_empty').html("");
   },
 })

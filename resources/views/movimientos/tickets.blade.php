@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="col-sm-9">
-			<vueble :items="movimientos" lang="es" :searcheable-props="['placa']">
+	<vueble :items="movimientos" lang="es" :searcheable-props="['placa']">
 			<template slot="colums">
 				<tr slot="colums">
 					<th>Placa</th>

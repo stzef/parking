@@ -189,6 +189,7 @@
                 <div class="row">
                     <div class="col-md-3">
                         <center><Clock :blink="true" /></center>
+                        <center><span v-if="days.m == 0 && days.d <= 15 && days.d > 0" >Su licencia vencera en [[days.d]] Dia/s , comuniquese con <a href="http://sistematizar.co/" target="_blank"> SistematizarEF</a> para su renovación.</span></center>
                         <hr>
                         <ul class="nav nav-stacked">
                             <li><a href="{{URL::route('entrada')}}" class="btn btn-block"><i class="glyphicon glyphicon-upload"></i>   ENTRADA </a></li>

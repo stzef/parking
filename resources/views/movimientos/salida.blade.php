@@ -112,7 +112,31 @@
 
           <!-- Modal Body-->
           <div class="modal-body">
-                <table class="table-responsive" id="table">
+                <vueble :items="movimientos" lang="es" :searcheable-props="['placa']">
+                        <template slot="colums">
+                            <tr slot="colums">
+                                <th>Placa</th>
+                                <th>Fecha Entrada</th>
+                                <th>Tarifa</th>
+                                <th>Tipo Vehiculo</th>
+                                <th>Tipo De Movimiento</th>
+                                <th>Accion</th>
+                            </tr>
+                        </template>
+                        <template slot="row" scope="item">
+                            <tr v-if="item.scope.ctimovi != 2" :id="item.scope.cmovi">
+                                    <td>[[item.scope.placa]]</td>
+                                    <td>[[item.scope.fhentrada]]</td>
+                                    <td>[[item.scope.tarifa.ntarifa]]</td>
+                                    <td>[[item.scope.tipovehiculo.ntipov]]</td>
+                                    <td>[[item.scope.timovi.ntimovi]]</td>
+                                    <td>
+                                        <button class="btn btn-primary" @click="setData(item.scope)" :disabled="item.scope.ctimovi == 2" data-dismiss="modal">Seleccionar</button>
+                                    </td>
+                            </tr>
+                        </template>
+                </vueble>
+                <!--<table class="table-responsive" id="table">
                     <thead>
                         <tr>
                             <th>Placa</th>
@@ -137,7 +161,7 @@
                             </tr>
                         </template>
                     </tbody>
-                </table>
+                </table>-->
           </div>
 
           <!-- Modal Footer-->

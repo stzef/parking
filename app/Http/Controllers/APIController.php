@@ -11,6 +11,8 @@ use \App\Models\Tarifas;
 use \App\Models\Timovi;
 use \App\Models\Tipovehiculo;
 use \Auth;
+use DateTime;
+
 class APIController extends Controller{
 	public function tarifas(Request $request){
 		if( Auth::user()){
@@ -35,6 +37,16 @@ class APIController extends Controller{
 	public function roles(Request $request){
 		$roles = \HttpOz\Roles\Models\Role::all();
 		return response()->json($roles->toArray());
+	}
+	public function days(Request $request){
+		$serial = strtotime(date(env('SERIAL')));
+		$hoy = strtotime(date("Y-m-d"));
+		if($hoy > $serial){
+			$interval = date_diff(new DateTime(date("Y-m-d")), new DateTime(date("Y-m-d")));
+		}else{
+			$interval = date_diff(new DateTime(env('SERIAL')), new DateTime(date("Y-m-d")));
+		}
+		return	response()->json($interval);
 	}
 	public function movimientos(Request $request){
 		$dataBody = $request->all();

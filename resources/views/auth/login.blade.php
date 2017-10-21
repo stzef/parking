@@ -59,6 +59,10 @@
                                 </a>
                             </div>
                         </div>
+                        <div class="message_initi">
+                            <span v-if="days.m == 0 && days.d == 0" >Su licencia se encuentra vencida , comuniquese con <a href="http://sistematizar.co/" target="_blank"> SistematizarEF</a> para su renovación.</span>
+                            <span v-if="days.m == 0 && days.d <= 15 && days.d > 0" >Su licencia vencera en [[days.d]] Dia/s , comuniquese con <a href="http://sistematizar.co/" target="_blank"> SistematizarEF</a> para su renovación.</span>
+                        </div>
                     </form>
                 </div>
             </div>

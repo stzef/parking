@@ -39,6 +39,7 @@ Route::group(['prefix'=>'movimientos'], function(){
 		Route::get('/', 'MovimientosController@config')->name('config');
 	});
 	Route::post('/time','MovimientosController@setTime')->name('time');
+	Route::post('/days','MovimientosController@getDays')->name('days');
 	Route::post('/params','MovimientosController@saveParams')->name('params');
 
 });
@@ -60,5 +61,8 @@ Route::group(['prefix' => 'api'], function(){
 	});
 	Route::group(['prefix' => 'roles'], function(){
 		Route::get('/', "APIController@roles");
+	});
+	Route::group(['prefix' => 'days'], function(){
+		Route::get('/', "APIController@days");
 	});
 });
